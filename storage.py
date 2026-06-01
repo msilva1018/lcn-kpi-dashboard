@@ -20,11 +20,13 @@ import streamlit as st
 
 DATA_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data.json")
 MONTHS = ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+WEEK_COLS = ["W1", "W2", "W3", "W4", "W5"]
 TIER_KEYS = ["tier1", "tier2", "tier3"]
 
 # Worksheet name -> header row
 SHEETS = {
-    "scorecard": ["Metric", "Expected", "Current"],
+    "scorecard": ["Metric", "Expected", "Agg"],
+    "scorecard_weeks": ["Month", "Metric"] + WEEK_COLS,
     "pipeline": ["Client", "Project", "Stage", "Win Probability (%)", "Confidence", "Next Step"],
     "strategy": ["Goal", "Expected", "Current"],
     "h2": ["kpi", "type", "target"] + MONTHS,
@@ -83,11 +85,37 @@ def _blank(v):
 
 
 def _rows_scorecard(data):
-    return _rows_numbers(data["scorecard"], "Metric")
+    return [[m.get("Metric", ""), _blank(m.get("Expected")), m.get("Agg", "sum")]
+            for m in data["scorecard"]]
 
 
 def _parse_scorecard(records):
-    return _parse_numbers(records, "Metric")
+    out = []
+    for r in records:
+        out.append({
+            "Metric": r.get("Metric", "") or "",
+            "Expected": _to_num(r.get("Expected")),
+            "Agg": (r.get("Agg") or "sum"),
+        })
+    return out
+
+
+def _rows_scorecard_weeks(data):
+    rows = []
+    for r in data.get("scorecard_weeks", []):
+        rows.append([r.get("Month", ""), r.get("Metric", "")]
+                    + [_blank(r.get(w)) for w in WEEK_COLS])
+    return rows
+
+
+def _parse_scorecard_weeks(records):
+    out = []
+    for r in records:
+        row = {"Month": r.get("Month", "") or "", "Metric": r.get("Metric", "") or ""}
+        for w in WEEK_COLS:
+            row[w] = _to_num(r.get(w))
+        out.append(row)
+    return out
 
 
 def _rows_pipeline(data):
@@ -148,12 +176,14 @@ def _parse_h2(records):
 
 PARSERS = {
     "scorecard": lambda recs, seed: _parse_scorecard(recs),
+    "scorecard_weeks": lambda recs, seed: _parse_scorecard_weeks(recs),
     "pipeline": lambda recs, seed: _parse_pipeline(recs),
     "strategy": lambda recs, seed: _parse_strategy(recs, seed),
     "h2": lambda recs, seed: _parse_h2(recs),
 }
 ROW_BUILDERS = {
     "scorecard": _rows_scorecard,
+    "scorecard_weeks": _rows_scorecard_weeks,
     "pipeline": _rows_pipeline,
     "strategy": _rows_strategy,
     "h2": _rows_h2,
