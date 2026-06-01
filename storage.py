@@ -197,12 +197,21 @@ class SheetsStore:
         data = {}
         for name, header in SHEETS.items():
             ws = self._ws(name)
-            values = ws.get_all_values()
-            if _needs_seed(values, header):
-                self._write(ws, header, ROW_BUILDERS[name](seed))
+            try:
+                values = ws.get_all_values()
+                if _needs_seed(values, header):
+                    self._write(ws, header, ROW_BUILDERS[name](seed))
+                    data[name] = seed[name]
+                else:
+                    data[name] = PARSERS[name](ws.get_all_records(), seed)
+            except Exception:
+                # Self-heal: if a worksheet is malformed or from an older schema,
+                # rebuild it from the packaged seed rather than crashing the app.
+                try:
+                    self._write(ws, header, ROW_BUILDERS[name](seed))
+                except Exception:
+                    pass
                 data[name] = seed[name]
-            else:
-                data[name] = PARSERS[name](ws.get_all_records(), seed)
         return data
 
     def save(self, data: dict):
