@@ -1,0 +1,55 @@
+{
+  "scorecard": [
+    {"Metric": "Founder hunting time", "Target 0-6 mo": "2 days/week protected", "Target 6-12 mo": "Sustain with monthly review", "Status": "On track", "Current / Notes": "", "Why it matters": "Protects senior selling capacity"},
+    {"Metric": "Senior strategic conversations", "Target 0-6 mo": "4-6 per month", "Target 6-12 mo": "4-6 per month", "Status": "On track", "Current / Notes": "", "Why it matters": "Measures real access, not activity volume"},
+    {"Metric": "Qualified pipeline created", "Target 0-6 mo": "8-12 stage-qualified opps", "Target 6-12 mo": "Carry 6-8 active opps", "Status": "On track", "Current / Notes": "", "Why it matters": "Creates enough shots in a low-volume model"},
+    {"Metric": "Priority dormant reactivation", "Target 0-6 mo": "100% top-tier touched", "Target 6-12 mo": "3-4 reactivated into live dialogue", "Status": "On track", "Current / Notes": "", "Why it matters": "Turns known relationships into faster-cycle pipeline"},
+    {"Metric": "Expansion in strong accounts", "Target 0-6 mo": "2 accounts with new opps", "Target 6-12 mo": "3 accounts broadened", "Status": "On track", "Current / Notes": "", "Why it matters": "Signals enterprise-partner traction"},
+    {"Metric": "Pre-emptive proposals", "Target 0-6 mo": "2-3/mo, validated needs", "Target 6-12 mo": "3-4/month", "Status": "On track", "Current / Notes": "", "Why it matters": "Keeps proposals tied to quality opportunities"},
+    {"Metric": "Net-new wins", "Target 0-6 mo": "1-2 wins by year-end", "Target 6-12 mo": "4-6 total across 12 months", "Status": "On track", "Current / Notes": "", "Why it matters": "Primary commercial outcome"}
+  ],
+  "pipeline": [
+    {"Client": "Teva", "Project": "Preferred Vendor Status", "Stage": "Open", "Win Probability (%)": 0, "Confidence": "Medium", "Next Step": ""},
+    {"Client": "Galderma", "Project": "KOL Database", "Stage": "Open", "Win Probability (%)": 0, "Confidence": "Medium", "Next Step": ""},
+    {"Client": "Galderma", "Project": "Monitoring U.S.", "Stage": "Open", "Win Probability (%)": 0, "Confidence": "Medium", "Next Step": ""},
+    {"Client": "Galderma", "Project": "Global Benchmark", "Stage": "Open", "Win Probability (%)": 0, "Confidence": "Medium", "Next Step": ""},
+    {"Client": "Xeris", "Project": "Distribution Shift", "Stage": "Open", "Win Probability (%)": 0, "Confidence": "Medium", "Next Step": ""},
+    {"Client": "LifeMine", "Project": "Monitoring", "Stage": "Open", "Win Probability (%)": 0, "Confidence": "Medium", "Next Step": ""}
+  ],
+  "strategy": {
+    "tier1": {
+      "tier_label": "Tier 01 \u00b7 Active",
+      "title": "Protect & Expand",
+      "heading": "Engagement priorities",
+      "points": "Deepen enterprise partnership across multiple functions and buyer levels within the account\nIdentify and pursue adjacent opportunities \u2014 new brands, therapeutic areas, or decision cycles\nDeliver Ring Session-quality outputs consistently to reinforce defensible, decision-ready value\nEstablish a formal QBR cadence to entrench LCN as the intelligence system of record",
+      "goal": "Year-end goal: 3 accounts broadened by year-end"
+    },
+    "tier2": {
+      "tier_label": "Tier 02 \u00b7 Dormant",
+      "title": "Reactivate & Re-Qualify",
+      "heading": "Reactivation approach",
+      "points": "Re-engage through value-forward outreach \u2014 lead with an insight or market development, not a pitch\nRevisit the original pain point: has the business decision environment shifted since last engagement?\nLeverage Dimensional Intelligence proof points and the SHU validation to reset credibility\nMap to the right current buyer \u2014 contacts shift; align to today's decision-maker, not yesterday's",
+      "goal": "6-month goal: 3-4 reactivated into live dialogue by 6 months"
+    },
+    "tier3": {
+      "tier_label": "Tier 03 \u00b7 Cold",
+      "title": "Qualify & Convert",
+      "heading": "Net-new acquisition strategy",
+      "points": "Target look-alike profiles to best existing accounts \u2014 same buyer persona, analogous therapeutic context\nEnter with a pre-emptive proposal anchored to a validated business need, not a capabilities overview\nUse thought leadership and Atomic Essays to build familiarity before the first direct outreach\nQualify rigorously before committing founder time \u2014 CRM must show stage, owner, and next step",
+      "goal": "Full-year goal: 1-2 net-new wins in 0-6 months \u00b7 4-6 across full year"
+    }
+  },
+  "h2": [
+    {"kpi": "Posts published", "type": "sum", "target": 8, "months": {}},
+    {"kpi": "Impressions (total)", "type": "sum", "target": 3000, "months": {}},
+    {"kpi": "Unique impressions", "type": "sum", "target": 1400, "months": {}},
+    {"kpi": "Net new followers", "type": "sum", "target": 10, "months": {}},
+    {"kpi": "Total followers (end of month)", "type": "eom", "target": null, "months": {}},
+    {"kpi": "Clicks", "type": "sum", "target": 200, "months": {}},
+    {"kpi": "Reactions", "type": "sum", "target": 50, "months": {}},
+    {"kpi": "Comments", "type": "sum", "target": 15, "months": {}},
+    {"kpi": "Reposts", "type": "sum", "target": 5, "months": {}},
+    {"kpi": "Engagement rate (portfolio)", "type": "avg", "target": 8.0, "months": {}},
+    {"kpi": "CTR (portfolio)", "type": "avg", "target": 6.0, "months": {}}
+  ]
+}
