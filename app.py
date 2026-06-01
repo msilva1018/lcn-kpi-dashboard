@@ -12,12 +12,25 @@ from datetime import datetime
 import pandas as pd
 import streamlit as st
 
-from storage import get_store, MONTHS, TIER_KEYS
+from storage import get_store, MONTHS, TIER_KEYS, _seed
 
 # --------------------------------------------------------------------------- #
 # Config & constants
 # --------------------------------------------------------------------------- #
 STATUS_OPTIONS = ["On track", "At risk", "Behind", "Achieved"]
+SCORECARD_COLS = ["Metric", "Expected 0-6 mo", "Expected 6-12 mo", "Where we are now", "Status"]
+STATUS_COLORS = {
+    "On track": ("#E6F4EC", "#1A7F4B"),
+    "At risk": ("#FBF1DD", "#B7791F"),
+    "Behind": ("#FBE7E5", "#C0392B"),
+    "Achieved": ("#E7EEF9", "#0A4595"),
+}
+
+
+def status_badge(status):
+    bg, fg = STATUS_COLORS.get(status, ("#EEF1F5", "#4F6B8A"))
+    return (f'<span style="background:{bg};color:{fg};padding:2px 9px;border-radius:999px;'
+            f'font-size:.72rem;font-weight:700;white-space:nowrap;">{status}</span>')
 STAGE_OPTIONS = ["Open", "Qualified", "Proposal", "Won", "Lost"]
 CONFIDENCE_OPTIONS = ["High-confidence", "Medium", "At-risk"]
 
@@ -67,7 +80,7 @@ if "data" not in st.session_state:
     st.session_state.data = store.load()
     st.session_state._last_saved_hash = _hash(st.session_state.data)
 if "defaults" not in st.session_state:
-    st.session_state.defaults = store.load() if store.persistent else copy.deepcopy(st.session_state.data)
+    st.session_state.defaults = _seed()
 
 data = st.session_state.data
 
@@ -171,9 +184,6 @@ with st.sidebar:
     with st.expander("Reset to seed values"):
         st.caption("Restores the original KPIs. Overwrites current data.")
         if st.button("↺ Reset", use_container_width=True):
-            seed = store.load() if not store.persistent else copy.deepcopy(st.session_state.defaults)
-            # reset uses the packaged seed regardless of backend:
-            from storage import _seed
             st.session_state.data = _seed()
             persist(toast=False)
             st.rerun()
@@ -188,17 +198,17 @@ tab1, tab2, tab3, tab4 = st.tabs(
 # ----- Tab 1: KPI Scorecard ------------------------------------------------- #
 with tab1:
     st.subheader("KPI Scorecard")
-    st.caption("Targets for 0–6 and 6–12 months. Update Status and Current / Notes as you progress.")
-    df_sc = pd.DataFrame(data["scorecard"])
+    st.caption("Expected targets for 0–6 and 6–12 months, alongside where we are now. "
+               "Set each metric's Status to see how we're tracking.")
+    df_sc = pd.DataFrame(data["scorecard"]).reindex(columns=SCORECARD_COLS).fillna("")
     edited_sc = st.data_editor(
         df_sc, key="sc_editor", use_container_width=True, hide_index=True, num_rows="dynamic",
         column_config={
             "Metric": st.column_config.TextColumn("Metric", width="medium"),
-            "Target 0-6 mo": st.column_config.TextColumn("0–6 months", width="medium"),
-            "Target 6-12 mo": st.column_config.TextColumn("6–12 months", width="medium"),
+            "Expected 0-6 mo": st.column_config.TextColumn("Expected · 0–6 mo", width="medium"),
+            "Expected 6-12 mo": st.column_config.TextColumn("Expected · 6–12 mo", width="medium"),
+            "Where we are now": st.column_config.TextColumn("Where we are now", width="medium"),
             "Status": st.column_config.SelectboxColumn("Status", options=STATUS_OPTIONS, width="small"),
-            "Current / Notes": st.column_config.TextColumn("Current / Notes", width="medium"),
-            "Why it matters": st.column_config.TextColumn("Why it matters", width="large"),
         },
     )
     st.session_state.data["scorecard"] = edited_sc.to_dict("records")
@@ -242,7 +252,8 @@ with tab2:
 # ----- Tab 3: Account Strategy ---------------------------------------------- #
 with tab3:
     st.subheader("Where We Play — and How We Win in Every Tier")
-    st.caption("2H 2026 · Account Strategy. One bullet per line.")
+    st.caption("2H 2026 · Account Strategy. Each tier shows its expected goal next to "
+               "where we are now. One priority per line.")
     tier_colors = {"tier1": "#0A4595", "tier2": "#0B2D5C", "tier3": "#5C7AAE"}
     cols = st.columns(3)
     for col, key in zip(cols, TIER_KEYS):
@@ -255,9 +266,24 @@ with tab3:
                 unsafe_allow_html=True,
             )
             t["heading"] = st.text_input("Section heading", t["heading"], key=f"{key}_h")
-            t["points"] = st.text_area("Priorities (one per line)", t["points"], height=200, key=f"{key}_p")
-            t["goal"] = st.text_input("Goal", t["goal"], key=f"{key}_g")
-            st.markdown(f"""<div class="goal-box"><b>▸</b> {t['goal']}</div>""", unsafe_allow_html=True)
+            t["points"] = st.text_area("Priorities (one per line)", t["points"], height=180, key=f"{key}_p")
+            st.markdown("**Goal**")
+            t["goal_target"] = st.text_input("Expected", t.get("goal_target", ""), key=f"{key}_gt")
+            t["goal_current"] = st.text_input("Where we are now", t.get("goal_current", ""), key=f"{key}_gc")
+            cur_status = t.get("goal_status", "On track")
+            t["goal_status"] = st.selectbox(
+                "Status", STATUS_OPTIONS,
+                index=STATUS_OPTIONS.index(cur_status) if cur_status in STATUS_OPTIONS else 0,
+                key=f"{key}_gs",
+            )
+            now = (t["goal_current"] or "").strip() or "—"
+            st.markdown(
+                f"""<div class="goal-box">
+                    <div>Expected: <b>{t['goal_target']}</b></div>
+                    <div style="margin-top:5px;">Now: {now} &nbsp; {status_badge(t['goal_status'])}</div>
+                    </div>""",
+                unsafe_allow_html=True,
+            )
         st.session_state.data["strategy"][key] = t
 
 # ----- Tab 4: H2 Monthly Tracker -------------------------------------------- #

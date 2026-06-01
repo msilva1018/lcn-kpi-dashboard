@@ -5,12 +5,10 @@ Two backends, same interface (load() -> dict, save(dict)):
   * SheetsStore  — Google Sheet (durable; edits persist forever). Used when
                    `gcp_service_account` and `sheet_url` are present in st.secrets.
   * JSONStore    — local data.json fallback (no persistence on Streamlit Cloud).
-                   Used automatically when secrets are not configured, so the
-                   app still runs for local development / preview.
 
 The Google Sheet is auto-bootstrapped on first load: missing worksheets are
-created and empty ones are seeded from data.json, so you only need to create a
-blank Sheet and share it with the service account.
+created and seeded from data.json. Worksheets whose header row no longer matches
+the expected columns are rebuilt from the seed, so schema changes apply cleanly.
 """
 from __future__ import annotations
 
@@ -26,9 +24,10 @@ TIER_KEYS = ["tier1", "tier2", "tier3"]
 
 # Worksheet name -> header row
 SHEETS = {
-    "scorecard": ["Metric", "Target 0-6 mo", "Target 6-12 mo", "Status", "Current / Notes", "Why it matters"],
+    "scorecard": ["Metric", "Expected 0-6 mo", "Expected 6-12 mo", "Where we are now", "Status"],
     "pipeline": ["Client", "Project", "Stage", "Win Probability (%)", "Confidence", "Next Step"],
-    "strategy": ["tier", "tier_label", "title", "heading", "points", "goal"],
+    "strategy": ["tier", "tier_label", "title", "heading", "points",
+                 "goal_target", "goal_current", "goal_status"],
     "h2": ["kpi", "type", "target"] + MONTHS,
 }
 
@@ -56,6 +55,14 @@ def _to_num(v):
         return None
 
 
+def _needs_seed(existing_values, expected_header) -> bool:
+    """True if the worksheet is empty or its header row doesn't match."""
+    if not existing_values:
+        return True
+    header = [str(c).strip() for c in existing_values[0]]
+    return header[: len(expected_header)] != expected_header or len(existing_values) < 2
+
+
 # ---- dict <-> sheet-rows converters --------------------------------------- #
 def _rows_scorecard(data):
     h = SHEETS["scorecard"]
@@ -65,7 +72,10 @@ def _rows_scorecard(data):
 def _parse_scorecard(records):
     out = []
     for r in records:
-        out.append({c: (r.get(c) if r.get(c) is not None else "") for c in SHEETS["scorecard"]})
+        row = {c: (r.get(c) if r.get(c) is not None else "") for c in SHEETS["scorecard"]}
+        if not row["Status"]:
+            row["Status"] = "On track"
+        out.append(row)
     return out
 
 
@@ -75,10 +85,7 @@ def _rows_pipeline(data):
     for r in data["pipeline"]:
         row = []
         for c in h:
-            if c == "Win Probability (%)":
-                row.append(_to_num(r.get(c)) or 0)
-            else:
-                row.append(r.get(c, ""))
+            row.append((_to_num(r.get(c)) or 0) if c == "Win Probability (%)" else r.get(c, ""))
         rows.append(row)
     return rows
 
@@ -101,7 +108,8 @@ def _rows_strategy(data):
     rows = []
     for k in TIER_KEYS:
         t = data["strategy"][k]
-        rows.append([k, t["tier_label"], t["title"], t["heading"], t["points"], t["goal"]])
+        rows.append([k, t["tier_label"], t["title"], t["heading"], t["points"],
+                     t.get("goal_target", ""), t.get("goal_current", ""), t.get("goal_status", "On track")])
     return rows
 
 
@@ -115,7 +123,9 @@ def _parse_strategy(records, fallback):
                 "title": r.get("title", "") or "",
                 "heading": r.get("heading", "") or "",
                 "points": r.get("points", "") or "",
-                "goal": r.get("goal", "") or "",
+                "goal_target": r.get("goal_target", "") or "",
+                "goal_current": r.get("goal_current", "") or "",
+                "goal_status": r.get("goal_status", "") or "On track",
             }
     return out
 
@@ -141,6 +151,20 @@ def _parse_h2(records):
             "months": {m: _to_num(r.get(m)) for m in MONTHS},
         })
     return out
+
+
+PARSERS = {
+    "scorecard": lambda recs, seed: _parse_scorecard(recs),
+    "pipeline": lambda recs, seed: _parse_pipeline(recs),
+    "strategy": lambda recs, seed: _parse_strategy(recs, seed),
+    "h2": lambda recs, seed: _parse_h2(recs),
+}
+ROW_BUILDERS = {
+    "scorecard": _rows_scorecard,
+    "pipeline": _rows_pipeline,
+    "strategy": _rows_strategy,
+    "h2": _rows_h2,
+}
 
 
 # --------------------------------------------------------------------------- #
@@ -178,50 +202,19 @@ class SheetsStore:
     def load(self) -> dict:
         seed = _seed()
         data = {}
-
-        # scorecard
-        ws = self._ws("scorecard")
-        vals = ws.get_all_values()
-        if len(vals) < 2:
-            self._write(ws, SHEETS["scorecard"], _rows_scorecard(seed))
-            data["scorecard"] = seed["scorecard"]
-        else:
-            data["scorecard"] = _parse_scorecard(ws.get_all_records())
-
-        # pipeline
-        ws = self._ws("pipeline")
-        vals = ws.get_all_values()
-        if len(vals) < 2:
-            self._write(ws, SHEETS["pipeline"], _rows_pipeline(seed))
-            data["pipeline"] = seed["pipeline"]
-        else:
-            data["pipeline"] = _parse_pipeline(ws.get_all_records())
-
-        # strategy
-        ws = self._ws("strategy")
-        vals = ws.get_all_values()
-        if len(vals) < 2:
-            self._write(ws, SHEETS["strategy"], _rows_strategy(seed))
-            data["strategy"] = seed["strategy"]
-        else:
-            data["strategy"] = _parse_strategy(ws.get_all_records(), seed)
-
-        # h2
-        ws = self._ws("h2")
-        vals = ws.get_all_values()
-        if len(vals) < 2:
-            self._write(ws, SHEETS["h2"], _rows_h2(seed))
-            data["h2"] = seed["h2"]
-        else:
-            data["h2"] = _parse_h2(ws.get_all_records())
-
+        for name, header in SHEETS.items():
+            ws = self._ws(name)
+            values = ws.get_all_values()
+            if _needs_seed(values, header):
+                self._write(ws, header, ROW_BUILDERS[name](seed))
+                data[name] = seed[name]
+            else:
+                data[name] = PARSERS[name](ws.get_all_records(), seed)
         return data
 
     def save(self, data: dict):
-        self._write(self._ws("scorecard"), SHEETS["scorecard"], _rows_scorecard(data))
-        self._write(self._ws("pipeline"), SHEETS["pipeline"], _rows_pipeline(data))
-        self._write(self._ws("strategy"), SHEETS["strategy"], _rows_strategy(data))
-        self._write(self._ws("h2"), SHEETS["h2"], _rows_h2(data))
+        for name, header in SHEETS.items():
+            self._write(self._ws(name), header, ROW_BUILDERS[name](data))
 
     @staticmethod
     def _write(ws, headers, rows):

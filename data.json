@@ -1,12 +1,12 @@
 {
   "scorecard": [
-    {"Metric": "Founder hunting time", "Target 0-6 mo": "2 days/week protected", "Target 6-12 mo": "Sustain with monthly review", "Status": "On track", "Current / Notes": "", "Why it matters": "Protects senior selling capacity"},
-    {"Metric": "Senior strategic conversations", "Target 0-6 mo": "4-6 per month", "Target 6-12 mo": "4-6 per month", "Status": "On track", "Current / Notes": "", "Why it matters": "Measures real access, not activity volume"},
-    {"Metric": "Qualified pipeline created", "Target 0-6 mo": "8-12 stage-qualified opps", "Target 6-12 mo": "Carry 6-8 active opps", "Status": "On track", "Current / Notes": "", "Why it matters": "Creates enough shots in a low-volume model"},
-    {"Metric": "Priority dormant reactivation", "Target 0-6 mo": "100% top-tier touched", "Target 6-12 mo": "3-4 reactivated into live dialogue", "Status": "On track", "Current / Notes": "", "Why it matters": "Turns known relationships into faster-cycle pipeline"},
-    {"Metric": "Expansion in strong accounts", "Target 0-6 mo": "2 accounts with new opps", "Target 6-12 mo": "3 accounts broadened", "Status": "On track", "Current / Notes": "", "Why it matters": "Signals enterprise-partner traction"},
-    {"Metric": "Pre-emptive proposals", "Target 0-6 mo": "2-3/mo, validated needs", "Target 6-12 mo": "3-4/month", "Status": "On track", "Current / Notes": "", "Why it matters": "Keeps proposals tied to quality opportunities"},
-    {"Metric": "Net-new wins", "Target 0-6 mo": "1-2 wins by year-end", "Target 6-12 mo": "4-6 total across 12 months", "Status": "On track", "Current / Notes": "", "Why it matters": "Primary commercial outcome"}
+    {"Metric": "Founder hunting time", "Expected 0-6 mo": "2 days/week protected", "Expected 6-12 mo": "Sustain with monthly review", "Where we are now": "", "Status": "On track"},
+    {"Metric": "Senior strategic conversations", "Expected 0-6 mo": "4-6 per month", "Expected 6-12 mo": "4-6 per month", "Where we are now": "", "Status": "On track"},
+    {"Metric": "Qualified pipeline created", "Expected 0-6 mo": "8-12 stage-qualified opps", "Expected 6-12 mo": "Carry 6-8 active opps", "Where we are now": "", "Status": "On track"},
+    {"Metric": "Priority dormant reactivation", "Expected 0-6 mo": "100% top-tier touched", "Expected 6-12 mo": "3-4 reactivated into live dialogue", "Where we are now": "", "Status": "On track"},
+    {"Metric": "Expansion in strong accounts", "Expected 0-6 mo": "2 accounts with new opps", "Expected 6-12 mo": "3 accounts broadened", "Where we are now": "", "Status": "On track"},
+    {"Metric": "Pre-emptive proposals", "Expected 0-6 mo": "2-3/mo, validated needs", "Expected 6-12 mo": "3-4/month", "Where we are now": "", "Status": "On track"},
+    {"Metric": "Net-new wins", "Expected 0-6 mo": "1-2 wins by year-end", "Expected 6-12 mo": "4-6 total across 12 months", "Where we are now": "", "Status": "On track"}
   ],
   "pipeline": [
     {"Client": "Teva", "Project": "Preferred Vendor Status", "Stage": "Open", "Win Probability (%)": 0, "Confidence": "Medium", "Next Step": ""},
@@ -22,21 +22,27 @@
       "title": "Protect & Expand",
       "heading": "Engagement priorities",
       "points": "Deepen enterprise partnership across multiple functions and buyer levels within the account\nIdentify and pursue adjacent opportunities \u2014 new brands, therapeutic areas, or decision cycles\nDeliver Ring Session-quality outputs consistently to reinforce defensible, decision-ready value\nEstablish a formal QBR cadence to entrench LCN as the intelligence system of record",
-      "goal": "Year-end goal: 3 accounts broadened by year-end"
+      "goal_target": "3 accounts broadened by year-end",
+      "goal_current": "",
+      "goal_status": "On track"
     },
     "tier2": {
       "tier_label": "Tier 02 \u00b7 Dormant",
       "title": "Reactivate & Re-Qualify",
       "heading": "Reactivation approach",
       "points": "Re-engage through value-forward outreach \u2014 lead with an insight or market development, not a pitch\nRevisit the original pain point: has the business decision environment shifted since last engagement?\nLeverage Dimensional Intelligence proof points and the SHU validation to reset credibility\nMap to the right current buyer \u2014 contacts shift; align to today's decision-maker, not yesterday's",
-      "goal": "6-month goal: 3-4 reactivated into live dialogue by 6 months"
+      "goal_target": "3-4 reactivated into live dialogue by 6 months",
+      "goal_current": "",
+      "goal_status": "On track"
     },
     "tier3": {
       "tier_label": "Tier 03 \u00b7 Cold",
       "title": "Qualify & Convert",
       "heading": "Net-new acquisition strategy",
       "points": "Target look-alike profiles to best existing accounts \u2014 same buyer persona, analogous therapeutic context\nEnter with a pre-emptive proposal anchored to a validated business need, not a capabilities overview\nUse thought leadership and Atomic Essays to build familiarity before the first direct outreach\nQualify rigorously before committing founder time \u2014 CRM must show stage, owner, and next step",
-      "goal": "Full-year goal: 1-2 net-new wins in 0-6 months \u00b7 4-6 across full year"
+      "goal_target": "1-2 net-new wins in 0-6 months \u00b7 4-6 across full year",
+      "goal_current": "",
+      "goal_status": "On track"
     }
   },
   "h2": [
