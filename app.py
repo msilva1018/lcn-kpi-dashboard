@@ -12,13 +12,62 @@ from datetime import datetime
 import pandas as pd
 import streamlit as st
 
-from storage import get_store, MONTHS, _seed
+from storage import get_store, MONTHS, WEEK_COLS, _seed
 
 # --------------------------------------------------------------------------- #
 # Config & constants
 # --------------------------------------------------------------------------- #
 STAGE_OPTIONS = ["Open", "Qualified", "Proposal", "Won", "Lost"]
 CONFIDENCE_OPTIONS = ["High-confidence", "Medium", "At-risk"]
+
+# H2 2026 horizon for the weekly scorecard month picker
+MONTHS_KEYS = [f"2026-{m:02d}" for m in range(6, 13)]
+_MONTH_NAMES = {6: "Jun", 7: "Jul", 8: "Aug", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec"}
+MONTH_LABELS = {k: f"{_MONTH_NAMES[int(k[5:])]} {k[:4]}" for k in MONTHS_KEYS}
+AGG_TO_LABEL = {"sum": "Sum", "snapshot": "Snapshot"}
+LABEL_TO_AGG = {"Sum": "sum", "Snapshot": "snapshot"}
+
+
+def _default_month():
+    key = f"{datetime.now().year}-{datetime.now().month:02d}"
+    return key if key in MONTHS_KEYS else MONTHS_KEYS[0]
+
+
+def weeks_index(weeks_rows):
+    """(month, metric) -> {W1..W5: value}."""
+    idx = {}
+    for r in weeks_rows:
+        idx[(r.get("Month"), r.get("Metric"))] = {w: r.get(w) for w in WEEK_COLS}
+    return idx
+
+
+def weeks_to_list(idx, metric_names):
+    """Rebuild the flat week-rows for every month × current metric, keeping values."""
+    out = []
+    for mo in MONTHS_KEYS:
+        for name in metric_names:
+            vals = idx.get((mo, name), {})
+            row = {"Month": mo, "Metric": name}
+            for w in WEEK_COLS:
+                row[w] = vals.get(w)
+            out.append(row)
+    return out
+
+
+def week_rollup(metric, week_vals):
+    """Return (mtd_number, gap_text, pct) for one metric's week values."""
+    nums = [v for v in week_vals if isinstance(v, (int, float))]
+    if metric.get("Agg", "sum") == "snapshot":
+        mtd = nums[-1] if nums else 0
+    else:
+        mtd = sum(nums)
+    e = metric.get("Expected")
+    e = e if isinstance(e, (int, float)) else None
+    if not e:
+        return mtd, "—", 0
+    if mtd >= e:
+        return mtd, ("✓ Goal met" if mtd == e else f"✓ +{_g(mtd - e)} over"), 100
+    return mtd, f"{_g(e - mtd)} to go", int(max(0, min(100, round(mtd / e * 100))))
 
 
 def _g(x):
@@ -246,16 +295,90 @@ tab1, tab2, tab3, tab4 = st.tabs(
 
 # ----- Tab 1: KPI Scorecard ------------------------------------------------- #
 with tab1:
-    st.subheader("KPI Scorecard")
-    st.caption("Expected vs current for each KPI, and how far we are from the goal. "
-               "Edit the Expected and Current columns — the gap and progress update automatically.")
-    edited_sc = numbers_editor(data["scorecard"], "Metric", "sc_editor")
-    st.session_state.data["scorecard"] = read_numbers(edited_sc, "Metric")
-    met, total, att = numbers_summary(st.session_state.data["scorecard"])
+    st.subheader("Weekly KPI Scorecard")
+    metrics = data["scorecard"]
+    metric_names = [m["Metric"] for m in metrics]
+
+    labels = [MONTH_LABELS[k] for k in MONTHS_KEYS]
+    default_label = MONTH_LABELS[_default_month()]
+    sel_label = st.selectbox("Month", labels, index=labels.index(default_label), key="sc_month")
+    sel_month = MONTHS_KEYS[labels.index(sel_label)]
+    st.caption("Log each week's number. **Sum** metrics add up toward the monthly target; "
+               "**Snapshot** metrics (e.g. active opps) show the latest week's count. "
+               "Month total, gap, and progress update automatically.")
+
+    widx = weeks_index(data["scorecard_weeks"])
+    rows = []
+    for m in metrics:
+        wk = widx.get((sel_month, m["Metric"]), {})
+        rec = {"Metric": m["Metric"], "Type": AGG_TO_LABEL.get(m.get("Agg", "sum"), "Sum"),
+               "Expected": m.get("Expected")}
+        for w in WEEK_COLS:
+            rec[w] = wk.get(w)
+        mtd, gap, pct = week_rollup(m, [wk.get(w) for w in WEEK_COLS])
+        rec["Month total"] = _g(mtd)
+        rec["How far from goal"] = gap
+        rec["% to goal"] = pct
+        rows.append(rec)
+
+    edited = st.data_editor(
+        pd.DataFrame(rows), key=f"sc_grid_{sel_month}", use_container_width=True, hide_index=True,
+        disabled=["Metric", "Type", "Expected", "Month total", "How far from goal", "% to goal"],
+        column_config={
+            "Metric": st.column_config.TextColumn("Metric", width="medium"),
+            "Type": st.column_config.TextColumn("Type", width="small"),
+            "Expected": st.column_config.NumberColumn("Monthly target", width="small"),
+            **{w: st.column_config.NumberColumn(w, step=1, width="small") for w in WEEK_COLS},
+            "Month total": st.column_config.TextColumn("Month total", width="small"),
+            "How far from goal": st.column_config.TextColumn("How far from goal", width="small"),
+            "% to goal": st.column_config.ProgressColumn("% to goal", min_value=0, max_value=100, format="%d%%"),
+        },
+    )
+    # write this month's week values back, keeping all other months intact
+    for i, m in enumerate(metrics):
+        row = edited.iloc[i]
+        widx[(sel_month, m["Metric"])] = {
+            w: (None if pd.isna(row[w]) else float(row[w])) for w in WEEK_COLS
+        }
+    st.session_state.data["scorecard_weeks"] = weeks_to_list(widx, metric_names)
+
+    # month summary
+    computed = [week_rollup(m, [widx.get((sel_month, m["Metric"]), {}).get(w) for w in WEEK_COLS])
+                for m in metrics]
+    valid = [(m, c[0]) for m, c in zip(metrics, computed)
+             if isinstance(m.get("Expected"), (int, float)) and m.get("Expected")]
+    met = sum(1 for m, mtd in valid if mtd >= m["Expected"])
+    att = round(sum(min(100, mtd / m["Expected"] * 100) for m, mtd in valid) / len(valid)) if valid else 0
     c1, c2, c3 = st.columns(3)
-    c1.metric("Goals met", f"{met}/{total}")
-    c2.metric("Below goal", total - met)
+    c1.metric(f"On-target ({sel_label})", f"{met}/{len(valid)}")
+    c2.metric("Below target", len(valid) - met)
     c3.metric("Avg attainment", f"{att}%")
+
+    with st.expander("⚙️ Edit monthly targets & roll-up type"):
+        st.caption("Set each KPI's monthly target and how weeks roll up. "
+                   "Sum = weekly entries add together. Snapshot = latest week's value (for counts like active opps).")
+        defs_df = pd.DataFrame([{"Metric": m["Metric"], "Monthly target": m.get("Expected"),
+                                 "Roll-up": AGG_TO_LABEL.get(m.get("Agg", "sum"), "Sum")} for m in metrics])
+        ed = st.data_editor(
+            defs_df, key="sc_defs", use_container_width=True, hide_index=True, num_rows="dynamic",
+            column_config={
+                "Metric": st.column_config.TextColumn("Metric", width="large"),
+                "Monthly target": st.column_config.NumberColumn("Monthly target", step=1, width="small"),
+                "Roll-up": st.column_config.SelectboxColumn("Roll-up", options=["Sum", "Snapshot"], width="small"),
+            },
+        )
+        new_defs = []
+        for _, r in ed.iterrows():
+            nm = "" if pd.isna(r["Metric"]) else str(r["Metric"]).strip()
+            if not nm:
+                continue
+            new_defs.append({
+                "Metric": nm,
+                "Expected": None if pd.isna(r["Monthly target"]) else float(r["Monthly target"]),
+                "Agg": LABEL_TO_AGG.get(r["Roll-up"], "sum"),
+            })
+        if new_defs:
+            st.session_state.data["scorecard"] = new_defs
 
 # ----- Tab 2: Open Bids Pipeline -------------------------------------------- #
 with tab2:
