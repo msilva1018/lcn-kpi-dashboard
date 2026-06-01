@@ -24,10 +24,9 @@ TIER_KEYS = ["tier1", "tier2", "tier3"]
 
 # Worksheet name -> header row
 SHEETS = {
-    "scorecard": ["Metric", "Expected 0-6 mo", "Expected 6-12 mo", "Where we are now", "Status"],
+    "scorecard": ["Metric", "Expected", "Current"],
     "pipeline": ["Client", "Project", "Stage", "Win Probability (%)", "Confidence", "Next Step"],
-    "strategy": ["tier", "tier_label", "title", "heading", "points",
-                 "goal_target", "goal_current", "goal_status"],
+    "strategy": ["Goal", "Expected", "Current"],
     "h2": ["kpi", "type", "target"] + MONTHS,
 }
 
@@ -64,19 +63,31 @@ def _needs_seed(existing_values, expected_header) -> bool:
 
 
 # ---- dict <-> sheet-rows converters --------------------------------------- #
+def _rows_numbers(rows, label):
+    return [[r.get(label, ""), _blank(r.get("Expected")), _blank(r.get("Current"))] for r in rows]
+
+
+def _parse_numbers(records, label):
+    out = []
+    for r in records:
+        out.append({
+            label: r.get(label, "") or "",
+            "Expected": _to_num(r.get("Expected")),
+            "Current": _to_num(r.get("Current")) or 0,
+        })
+    return out
+
+
+def _blank(v):
+    return "" if v is None else v
+
+
 def _rows_scorecard(data):
-    h = SHEETS["scorecard"]
-    return [[r.get(c, "") for c in h] for r in data["scorecard"]]
+    return _rows_numbers(data["scorecard"], "Metric")
 
 
 def _parse_scorecard(records):
-    out = []
-    for r in records:
-        row = {c: (r.get(c) if r.get(c) is not None else "") for c in SHEETS["scorecard"]}
-        if not row["Status"]:
-            row["Status"] = "On track"
-        out.append(row)
-    return out
+    return _parse_numbers(records, "Metric")
 
 
 def _rows_pipeline(data):
@@ -105,29 +116,11 @@ def _parse_pipeline(records):
 
 
 def _rows_strategy(data):
-    rows = []
-    for k in TIER_KEYS:
-        t = data["strategy"][k]
-        rows.append([k, t["tier_label"], t["title"], t["heading"], t["points"],
-                     t.get("goal_target", ""), t.get("goal_current", ""), t.get("goal_status", "On track")])
-    return rows
+    return _rows_numbers(data["strategy"], "Goal")
 
 
 def _parse_strategy(records, fallback):
-    out = copy.deepcopy(fallback["strategy"])
-    for r in records:
-        k = r.get("tier")
-        if k in TIER_KEYS:
-            out[k] = {
-                "tier_label": r.get("tier_label", "") or "",
-                "title": r.get("title", "") or "",
-                "heading": r.get("heading", "") or "",
-                "points": r.get("points", "") or "",
-                "goal_target": r.get("goal_target", "") or "",
-                "goal_current": r.get("goal_current", "") or "",
-                "goal_status": r.get("goal_status", "") or "On track",
-            }
-    return out
+    return _parse_numbers(records, "Goal")
 
 
 def _rows_h2(data):

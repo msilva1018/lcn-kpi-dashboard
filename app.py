@@ -12,27 +12,76 @@ from datetime import datetime
 import pandas as pd
 import streamlit as st
 
-from storage import get_store, MONTHS, TIER_KEYS, _seed
+from storage import get_store, MONTHS, _seed
 
 # --------------------------------------------------------------------------- #
 # Config & constants
 # --------------------------------------------------------------------------- #
-STATUS_OPTIONS = ["On track", "At risk", "Behind", "Achieved"]
-SCORECARD_COLS = ["Metric", "Expected 0-6 mo", "Expected 6-12 mo", "Where we are now", "Status"]
-STATUS_COLORS = {
-    "On track": ("#E6F4EC", "#1A7F4B"),
-    "At risk": ("#FBF1DD", "#B7791F"),
-    "Behind": ("#FBE7E5", "#C0392B"),
-    "Achieved": ("#E7EEF9", "#0A4595"),
-}
-
-
-def status_badge(status):
-    bg, fg = STATUS_COLORS.get(status, ("#EEF1F5", "#4F6B8A"))
-    return (f'<span style="background:{bg};color:{fg};padding:2px 9px;border-radius:999px;'
-            f'font-size:.72rem;font-weight:700;white-space:nowrap;">{status}</span>')
 STAGE_OPTIONS = ["Open", "Qualified", "Proposal", "Won", "Lost"]
 CONFIDENCE_OPTIONS = ["High-confidence", "Medium", "At-risk"]
+
+
+def _g(x):
+    """Tidy number formatting: 2 not 2.0, 2.5 stays 2.5."""
+    return f"{x:g}" if isinstance(x, (int, float)) else "0"
+
+
+def numbers_df(rows, label):
+    """Build the Expected/Current/Gap/% dataframe for a numeric KPI table."""
+    recs = []
+    for r in rows:
+        exp, cur = r.get("Expected"), r.get("Current")
+        e = exp if isinstance(exp, (int, float)) else None
+        c = cur if isinstance(cur, (int, float)) else 0
+        if not e:  # no/zero target → nothing to measure against
+            gap_txt, pct = "—", 0
+        elif c >= e:
+            gap_txt = "✓ Goal met" if c == e else f"✓ +{_g(c - e)} over"
+            pct = 100
+        else:
+            gap_txt = f"{_g(e - c)} to go"
+            pct = int(max(0, min(100, round(c / e * 100))))
+        recs.append({label: r.get(label, ""), "Expected": exp, "Current": cur,
+                     "Gap to goal": gap_txt, "% to goal": pct})
+    return pd.DataFrame(recs)
+
+
+def read_numbers(edited_df, label):
+    """Read the editable columns back into the stored structure."""
+    out = []
+    for _, row in edited_df.iterrows():
+        name = row[label]
+        out.append({
+            label: "" if pd.isna(name) else str(name),
+            "Expected": None if pd.isna(row["Expected"]) else float(row["Expected"]),
+            "Current": 0 if pd.isna(row["Current"]) else float(row["Current"]),
+        })
+    return out
+
+
+def numbers_summary(rows):
+    valid = [(r.get("Expected"), r.get("Current")) for r in rows
+             if isinstance(r.get("Expected"), (int, float)) and r.get("Expected")]
+    met = sum(1 for e, c in valid if (c or 0) >= e)
+    att = round(sum(min(100, (c or 0) / e * 100) for e, c in valid) / len(valid)) if valid else 0
+    return met, len(valid), att
+
+
+def numbers_editor(rows, label, key):
+    """Render a numbers table (Metric/Goal · Expected · Current · Gap · %)."""
+    df = numbers_df(rows, label)
+    return st.data_editor(
+        df, key=key, use_container_width=True, hide_index=True, num_rows="dynamic",
+        disabled=[label, "Gap to goal", "% to goal"],
+        column_config={
+            label: st.column_config.TextColumn(label, width="large"),
+            "Expected": st.column_config.NumberColumn("Expected", step=1, width="small"),
+            "Current": st.column_config.NumberColumn("Current", step=1, width="small"),
+            "Gap to goal": st.column_config.TextColumn("How far from goal", width="small"),
+            "% to goal": st.column_config.ProgressColumn(
+                "% to goal", min_value=0, max_value=100, format="%d%%"),
+        },
+    )
 
 st.set_page_config(
     page_title="LCN Consulting · 2026 KPI Dashboard",
@@ -198,26 +247,15 @@ tab1, tab2, tab3, tab4 = st.tabs(
 # ----- Tab 1: KPI Scorecard ------------------------------------------------- #
 with tab1:
     st.subheader("KPI Scorecard")
-    st.caption("Expected targets for 0–6 and 6–12 months, alongside where we are now. "
-               "Set each metric's Status to see how we're tracking.")
-    df_sc = pd.DataFrame(data["scorecard"]).reindex(columns=SCORECARD_COLS).fillna("")
-    edited_sc = st.data_editor(
-        df_sc, key="sc_editor", use_container_width=True, hide_index=True, num_rows="dynamic",
-        column_config={
-            "Metric": st.column_config.TextColumn("Metric", width="medium"),
-            "Expected 0-6 mo": st.column_config.TextColumn("Expected · 0–6 mo", width="medium"),
-            "Expected 6-12 mo": st.column_config.TextColumn("Expected · 6–12 mo", width="medium"),
-            "Where we are now": st.column_config.TextColumn("Where we are now", width="medium"),
-            "Status": st.column_config.SelectboxColumn("Status", options=STATUS_OPTIONS, width="small"),
-        },
-    )
-    st.session_state.data["scorecard"] = edited_sc.to_dict("records")
-    counts = edited_sc["Status"].value_counts().to_dict() if "Status" in edited_sc else {}
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("On track", counts.get("On track", 0))
-    c2.metric("At risk", counts.get("At risk", 0))
-    c3.metric("Behind", counts.get("Behind", 0))
-    c4.metric("Achieved", counts.get("Achieved", 0))
+    st.caption("Expected vs current for each KPI, and how far we are from the goal. "
+               "Edit the Expected and Current columns — the gap and progress update automatically.")
+    edited_sc = numbers_editor(data["scorecard"], "Metric", "sc_editor")
+    st.session_state.data["scorecard"] = read_numbers(edited_sc, "Metric")
+    met, total, att = numbers_summary(st.session_state.data["scorecard"])
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Goals met", f"{met}/{total}")
+    c2.metric("Below goal", total - met)
+    c3.metric("Avg attainment", f"{att}%")
 
 # ----- Tab 2: Open Bids Pipeline -------------------------------------------- #
 with tab2:
@@ -251,40 +289,15 @@ with tab2:
 
 # ----- Tab 3: Account Strategy ---------------------------------------------- #
 with tab3:
-    st.subheader("Where We Play — and How We Win in Every Tier")
-    st.caption("2H 2026 · Account Strategy. Each tier shows its expected goal next to "
-               "where we are now. One priority per line.")
-    tier_colors = {"tier1": "#0A4595", "tier2": "#0B2D5C", "tier3": "#5C7AAE"}
-    cols = st.columns(3)
-    for col, key in zip(cols, TIER_KEYS):
-        t = data["strategy"][key]
-        with col:
-            st.markdown(
-                f"""<div class="tier-card" style="background:{tier_colors[key]};">
-                    <div class="tier-sub">{t['tier_label'].upper()}</div>
-                    <div class="tier-title">{t['title']}</div></div>""",
-                unsafe_allow_html=True,
-            )
-            t["heading"] = st.text_input("Section heading", t["heading"], key=f"{key}_h")
-            t["points"] = st.text_area("Priorities (one per line)", t["points"], height=180, key=f"{key}_p")
-            st.markdown("**Goal**")
-            t["goal_target"] = st.text_input("Expected", t.get("goal_target", ""), key=f"{key}_gt")
-            t["goal_current"] = st.text_input("Where we are now", t.get("goal_current", ""), key=f"{key}_gc")
-            cur_status = t.get("goal_status", "On track")
-            t["goal_status"] = st.selectbox(
-                "Status", STATUS_OPTIONS,
-                index=STATUS_OPTIONS.index(cur_status) if cur_status in STATUS_OPTIONS else 0,
-                key=f"{key}_gs",
-            )
-            now = (t["goal_current"] or "").strip() or "—"
-            st.markdown(
-                f"""<div class="goal-box">
-                    <div>Expected: <b>{t['goal_target']}</b></div>
-                    <div style="margin-top:5px;">Now: {now} &nbsp; {status_badge(t['goal_status'])}</div>
-                    </div>""",
-                unsafe_allow_html=True,
-            )
-        st.session_state.data["strategy"][key] = t
+    st.subheader("Account Strategy — Goals")
+    st.caption("The strategic goals as numbers: expected vs current, and the gap left to close.")
+    edited_st = numbers_editor(data["strategy"], "Goal", "st_editor")
+    st.session_state.data["strategy"] = read_numbers(edited_st, "Goal")
+    met, total, att = numbers_summary(st.session_state.data["strategy"])
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Goals met", f"{met}/{total}")
+    c2.metric("Below goal", total - met)
+    c3.metric("Avg attainment", f"{att}%")
 
 # ----- Tab 4: H2 Monthly Tracker -------------------------------------------- #
 with tab4:

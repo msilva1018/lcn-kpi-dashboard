@@ -1,12 +1,17 @@
 {
   "scorecard": [
-    {"Metric": "Founder hunting time", "Expected 0-6 mo": "2 days/week protected", "Expected 6-12 mo": "Sustain with monthly review", "Where we are now": "", "Status": "On track"},
-    {"Metric": "Senior strategic conversations", "Expected 0-6 mo": "4-6 per month", "Expected 6-12 mo": "4-6 per month", "Where we are now": "", "Status": "On track"},
-    {"Metric": "Qualified pipeline created", "Expected 0-6 mo": "8-12 stage-qualified opps", "Expected 6-12 mo": "Carry 6-8 active opps", "Where we are now": "", "Status": "On track"},
-    {"Metric": "Priority dormant reactivation", "Expected 0-6 mo": "100% top-tier touched", "Expected 6-12 mo": "3-4 reactivated into live dialogue", "Where we are now": "", "Status": "On track"},
-    {"Metric": "Expansion in strong accounts", "Expected 0-6 mo": "2 accounts with new opps", "Expected 6-12 mo": "3 accounts broadened", "Where we are now": "", "Status": "On track"},
-    {"Metric": "Pre-emptive proposals", "Expected 0-6 mo": "2-3/mo, validated needs", "Expected 6-12 mo": "3-4/month", "Where we are now": "", "Status": "On track"},
-    {"Metric": "Net-new wins", "Expected 0-6 mo": "1-2 wins by year-end", "Expected 6-12 mo": "4-6 total across 12 months", "Where we are now": "", "Status": "On track"}
+    {"Metric": "Founder hunting days / week", "Expected": 2, "Current": 0},
+    {"Metric": "Senior strategic conversations / month", "Expected": 6, "Current": 0},
+    {"Metric": "Qualified pipeline \u2014 active opps", "Expected": 8, "Current": 0},
+    {"Metric": "Dormant accounts reactivated", "Expected": 4, "Current": 0},
+    {"Metric": "Strong accounts expanded", "Expected": 3, "Current": 0},
+    {"Metric": "Pre-emptive proposals / month", "Expected": 4, "Current": 0},
+    {"Metric": "Net-new wins (12 mo)", "Expected": 6, "Current": 0}
+  ],
+  "strategy": [
+    {"Goal": "Accounts broadened (year-end)", "Expected": 3, "Current": 0},
+    {"Goal": "Dormant reactivated into live dialogue", "Expected": 4, "Current": 0},
+    {"Goal": "Net-new wins (full year)", "Expected": 6, "Current": 0}
   ],
   "pipeline": [
     {"Client": "Teva", "Project": "Preferred Vendor Status", "Stage": "Open", "Win Probability (%)": 0, "Confidence": "Medium", "Next Step": ""},
@@ -16,35 +21,6 @@
     {"Client": "Xeris", "Project": "Distribution Shift", "Stage": "Open", "Win Probability (%)": 0, "Confidence": "Medium", "Next Step": ""},
     {"Client": "LifeMine", "Project": "Monitoring", "Stage": "Open", "Win Probability (%)": 0, "Confidence": "Medium", "Next Step": ""}
   ],
-  "strategy": {
-    "tier1": {
-      "tier_label": "Tier 01 \u00b7 Active",
-      "title": "Protect & Expand",
-      "heading": "Engagement priorities",
-      "points": "Deepen enterprise partnership across multiple functions and buyer levels within the account\nIdentify and pursue adjacent opportunities \u2014 new brands, therapeutic areas, or decision cycles\nDeliver Ring Session-quality outputs consistently to reinforce defensible, decision-ready value\nEstablish a formal QBR cadence to entrench LCN as the intelligence system of record",
-      "goal_target": "3 accounts broadened by year-end",
-      "goal_current": "",
-      "goal_status": "On track"
-    },
-    "tier2": {
-      "tier_label": "Tier 02 \u00b7 Dormant",
-      "title": "Reactivate & Re-Qualify",
-      "heading": "Reactivation approach",
-      "points": "Re-engage through value-forward outreach \u2014 lead with an insight or market development, not a pitch\nRevisit the original pain point: has the business decision environment shifted since last engagement?\nLeverage Dimensional Intelligence proof points and the SHU validation to reset credibility\nMap to the right current buyer \u2014 contacts shift; align to today's decision-maker, not yesterday's",
-      "goal_target": "3-4 reactivated into live dialogue by 6 months",
-      "goal_current": "",
-      "goal_status": "On track"
-    },
-    "tier3": {
-      "tier_label": "Tier 03 \u00b7 Cold",
-      "title": "Qualify & Convert",
-      "heading": "Net-new acquisition strategy",
-      "points": "Target look-alike profiles to best existing accounts \u2014 same buyer persona, analogous therapeutic context\nEnter with a pre-emptive proposal anchored to a validated business need, not a capabilities overview\nUse thought leadership and Atomic Essays to build familiarity before the first direct outreach\nQualify rigorously before committing founder time \u2014 CRM must show stage, owner, and next step",
-      "goal_target": "1-2 net-new wins in 0-6 months \u00b7 4-6 across full year",
-      "goal_current": "",
-      "goal_status": "On track"
-    }
-  },
   "h2": [
     {"kpi": "Posts published", "type": "sum", "target": 8, "months": {}},
     {"kpi": "Impressions (total)", "type": "sum", "target": 3000, "months": {}},
