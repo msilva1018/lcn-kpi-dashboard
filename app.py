@@ -75,6 +75,16 @@ def _g(x):
     return f"{x:g}" if isinstance(x, (int, float)) else "0"
 
 
+def numify(df, cols):
+    """Force columns to a stable float dtype so st.data_editor keeps edits
+    (an all-empty column is dtype object and flips to numeric on first entry,
+    which makes Streamlit discard the edit). Empty cells become NaN."""
+    for c in cols:
+        if c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
+    return df
+
+
 def numbers_df(rows, label):
     """Build the Expected/Current/Gap/% dataframe for a numeric KPI table."""
     recs = []
@@ -323,7 +333,7 @@ with tab1:
         rows.append(rec)
 
     edited = st.data_editor(
-        pd.DataFrame(rows), key=f"sc_grid_{sel_month}", use_container_width=True, hide_index=True,
+        numify(pd.DataFrame(rows), WEEK_COLS + ["Expected", "% to goal"]), key=f"sc_grid_{sel_month}", use_container_width=True, hide_index=True,
         disabled=["Metric", "Type", "Expected", "Month total", "How far from goal", "% to goal"],
         column_config={
             "Metric": st.column_config.TextColumn("Metric", width="medium"),
@@ -413,7 +423,7 @@ with tab_an:
         ccfg[cn] = st.column_config.NumberColumn(cn, min_value=0, step=1, format="%d", width="small")
     ccfg["Total"] = st.column_config.NumberColumn("Total", format="%d", width="small")
     edited_c = st.data_editor(
-        pd.DataFrame(crows), key=f"an_comp_{a_sel_month}", use_container_width=True, hide_index=True,
+        numify(pd.DataFrame(crows), comp_names + ["Total"]), key=f"an_comp_{a_sel_month}", use_container_width=True, hide_index=True,
         disabled=["Analyst", "Total"], column_config=ccfg,
     )
     for i, an in enumerate(analysts):
@@ -439,7 +449,7 @@ with tab_an:
         c = ridx.get((a_sel_month, an), {})
         rrows.append({"Analyst": an, "Risks taken": c.get("Count"), "Explanation": c.get("Explanation", "")})
     edited_r = st.data_editor(
-        pd.DataFrame(rrows), key=f"an_risk_{a_sel_month}", use_container_width=True, hide_index=True,
+        numify(pd.DataFrame(rrows), ["Risks taken"]), key=f"an_risk_{a_sel_month}", use_container_width=True, hide_index=True,
         disabled=["Analyst"],
         column_config={
             "Analyst": st.column_config.TextColumn("Analyst", width="small"),
@@ -474,7 +484,7 @@ with tab_an:
         lrows.append({"Analyst": an, "Things learned": c.get("Count"),
                       "Learning 1": c.get("L1", ""), "Learning 2": c.get("L2", "")})
     edited_l = st.data_editor(
-        pd.DataFrame(lrows), key=f"an_learn_{a_sel_month}", use_container_width=True, hide_index=True,
+        numify(pd.DataFrame(lrows), ["Things learned"]), key=f"an_learn_{a_sel_month}", use_container_width=True, hide_index=True,
         disabled=["Analyst"],
         column_config={
             "Analyst": st.column_config.TextColumn("Analyst", width="small"),
@@ -561,7 +571,7 @@ with tab4:
     st.subheader("H2 2026 Monthly Tracker")
     st.caption("Enter each month from your LinkedIn analytics export. H2 Total/Avg and vs Target "
                "auto-calculate. Sums for counts, averages for rates; Total followers shows the latest month.")
-    df_h2 = h2_to_dataframe(data["h2"])
+    df_h2 = numify(h2_to_dataframe(data["h2"]), MONTHS + ["Monthly Target"])
     month_cfg = {m: st.column_config.NumberColumn(m, step=1) for m in MONTHS}
     edited_h2 = st.data_editor(
         df_h2, key="h2_editor", use_container_width=True, hide_index=True,
