@@ -30,8 +30,11 @@ SHEETS = {
     "pipeline": ["Client", "Project", "Stage", "Win Probability (%)", "Confidence", "Next Step"],
     "strategy": ["Goal", "Expected", "Current"],
     "h2": ["kpi", "type", "target"] + MONTHS,
-    "analyst": ["KPI", "kind", "desc"],
-    "analyst_months": ["Month", "KPI", "Rating", "Note"],
+    "analysts": ["Analyst"],
+    "components": ["Component", "desc"],
+    "analyst_components": ["Month", "Analyst", "Component", "Count"],
+    "analyst_risk": ["Month", "Analyst", "Count", "Explanation"],
+    "analyst_learned": ["Month", "Analyst", "Count", "Learning 1", "Learning 2"],
 }
 
 SCOPES = [
@@ -176,31 +179,57 @@ def _parse_h2(records):
     return out
 
 
-def _rows_analyst(data):
-    return [[a.get("KPI", ""), a.get("kind", "rating"), a.get("desc", "")]
-            for a in data.get("analyst", [])]
+def _rows_analysts(data):
+    return [[a.get("Analyst", "")] for a in data.get("analysts", [])]
 
 
-def _parse_analyst(records):
-    return [{
-        "KPI": r.get("KPI", "") or "",
-        "kind": (r.get("kind") or "rating"),
-        "desc": (r.get("desc") or ""),
-    } for r in records]
+def _parse_analysts(records):
+    return [{"Analyst": (r.get("Analyst") or "").strip()}
+            for r in records if (r.get("Analyst") or "").strip()]
 
 
-def _rows_analyst_months(data):
-    return [[r.get("Month", ""), r.get("KPI", ""), _blank(r.get("Rating")), r.get("Note", "") or ""]
-            for r in data.get("analyst_months", [])]
+def _rows_components(data):
+    return [[c.get("Component", ""), c.get("desc", "")] for c in data.get("components", [])]
 
 
-def _parse_analyst_months(records):
-    return [{
-        "Month": r.get("Month", "") or "",
-        "KPI": r.get("KPI", "") or "",
-        "Rating": _to_num(r.get("Rating")),
-        "Note": (r.get("Note") or ""),
-    } for r in records]
+def _parse_components(records):
+    return [{"Component": (r.get("Component") or "").strip(), "desc": (r.get("desc") or "")}
+            for r in records if (r.get("Component") or "").strip()]
+
+
+def _rows_analyst_components(data):
+    return [[r.get("Month", ""), r.get("Analyst", ""), r.get("Component", ""), _blank(r.get("Count"))]
+            for r in data.get("analyst_components", [])]
+
+
+def _parse_analyst_components(records):
+    return [{"Month": r.get("Month", "") or "", "Analyst": r.get("Analyst", "") or "",
+             "Component": r.get("Component", "") or "", "Count": _to_num(r.get("Count"))}
+            for r in records]
+
+
+def _rows_analyst_risk(data):
+    return [[r.get("Month", ""), r.get("Analyst", ""), _blank(r.get("Count")), r.get("Explanation", "") or ""]
+            for r in data.get("analyst_risk", [])]
+
+
+def _parse_analyst_risk(records):
+    return [{"Month": r.get("Month", "") or "", "Analyst": r.get("Analyst", "") or "",
+             "Count": _to_num(r.get("Count")), "Explanation": (r.get("Explanation") or "")}
+            for r in records]
+
+
+def _rows_analyst_learned(data):
+    return [[r.get("Month", ""), r.get("Analyst", ""), _blank(r.get("Count")),
+             r.get("Learning 1", "") or "", r.get("Learning 2", "") or ""]
+            for r in data.get("analyst_learned", [])]
+
+
+def _parse_analyst_learned(records):
+    return [{"Month": r.get("Month", "") or "", "Analyst": r.get("Analyst", "") or "",
+             "Count": _to_num(r.get("Count")),
+             "Learning 1": (r.get("Learning 1") or ""), "Learning 2": (r.get("Learning 2") or "")}
+            for r in records]
 
 
 PARSERS = {
@@ -209,8 +238,11 @@ PARSERS = {
     "pipeline": lambda recs, seed: _parse_pipeline(recs),
     "strategy": lambda recs, seed: _parse_strategy(recs, seed),
     "h2": lambda recs, seed: _parse_h2(recs),
-    "analyst": lambda recs, seed: _parse_analyst(recs),
-    "analyst_months": lambda recs, seed: _parse_analyst_months(recs),
+    "analysts": lambda recs, seed: _parse_analysts(recs),
+    "components": lambda recs, seed: _parse_components(recs),
+    "analyst_components": lambda recs, seed: _parse_analyst_components(recs),
+    "analyst_risk": lambda recs, seed: _parse_analyst_risk(recs),
+    "analyst_learned": lambda recs, seed: _parse_analyst_learned(recs),
 }
 ROW_BUILDERS = {
     "scorecard": _rows_scorecard,
@@ -218,8 +250,11 @@ ROW_BUILDERS = {
     "pipeline": _rows_pipeline,
     "strategy": _rows_strategy,
     "h2": _rows_h2,
-    "analyst": _rows_analyst,
-    "analyst_months": _rows_analyst_months,
+    "analysts": _rows_analysts,
+    "components": _rows_components,
+    "analyst_components": _rows_analyst_components,
+    "analyst_risk": _rows_analyst_risk,
+    "analyst_learned": _rows_analyst_learned,
 }
 
 
