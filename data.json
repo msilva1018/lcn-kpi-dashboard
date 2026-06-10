@@ -613,5 +613,338 @@
       "target": 6.0,
       "months": {}
     }
+  ],
+  "analyst": [
+    {
+      "KPI": "Command Engine",
+      "kind": "rating",
+      "desc": "Intentional, outcome-driven interactions. Maps research purpose to business decisions before work begins."
+    },
+    {
+      "KPI": "Account Intelligence System",
+      "kind": "rating",
+      "desc": "Full client and stakeholder visibility. Context on decision pathways and organizational dynamics."
+    },
+    {
+      "KPI": "Momentum Map",
+      "kind": "rating",
+      "desc": "Execution alignment and forward motion. Visibility and progress across every milestone."
+    },
+    {
+      "KPI": "Insights Model",
+      "kind": "rating",
+      "desc": "Adherence to operational process to derive insights versus findings."
+    },
+    {
+      "KPI": "Ring Session",
+      "kind": "rating",
+      "desc": "Adversarial review and quality control. Every output challenged before delivery."
+    },
+    {
+      "KPI": "Risk taken",
+      "kind": "rating_note",
+      "desc": "Risk taken this month, with an explanation."
+    },
+    {
+      "KPI": "Things learned about client",
+      "kind": "note",
+      "desc": "What we learned about the client this month."
+    }
+  ],
+  "analyst_months": [
+    {
+      "Month": "2026-06",
+      "KPI": "Command Engine",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-06",
+      "KPI": "Account Intelligence System",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-06",
+      "KPI": "Momentum Map",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-06",
+      "KPI": "Insights Model",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-06",
+      "KPI": "Ring Session",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-06",
+      "KPI": "Risk taken",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-06",
+      "KPI": "Things learned about client",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-07",
+      "KPI": "Command Engine",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-07",
+      "KPI": "Account Intelligence System",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-07",
+      "KPI": "Momentum Map",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-07",
+      "KPI": "Insights Model",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-07",
+      "KPI": "Ring Session",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-07",
+      "KPI": "Risk taken",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-07",
+      "KPI": "Things learned about client",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-08",
+      "KPI": "Command Engine",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-08",
+      "KPI": "Account Intelligence System",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-08",
+      "KPI": "Momentum Map",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-08",
+      "KPI": "Insights Model",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-08",
+      "KPI": "Ring Session",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-08",
+      "KPI": "Risk taken",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-08",
+      "KPI": "Things learned about client",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-09",
+      "KPI": "Command Engine",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-09",
+      "KPI": "Account Intelligence System",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-09",
+      "KPI": "Momentum Map",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-09",
+      "KPI": "Insights Model",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-09",
+      "KPI": "Ring Session",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-09",
+      "KPI": "Risk taken",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-09",
+      "KPI": "Things learned about client",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-10",
+      "KPI": "Command Engine",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-10",
+      "KPI": "Account Intelligence System",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-10",
+      "KPI": "Momentum Map",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-10",
+      "KPI": "Insights Model",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-10",
+      "KPI": "Ring Session",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-10",
+      "KPI": "Risk taken",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-10",
+      "KPI": "Things learned about client",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-11",
+      "KPI": "Command Engine",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-11",
+      "KPI": "Account Intelligence System",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-11",
+      "KPI": "Momentum Map",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-11",
+      "KPI": "Insights Model",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-11",
+      "KPI": "Ring Session",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-11",
+      "KPI": "Risk taken",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-11",
+      "KPI": "Things learned about client",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-12",
+      "KPI": "Command Engine",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-12",
+      "KPI": "Account Intelligence System",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-12",
+      "KPI": "Momentum Map",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-12",
+      "KPI": "Insights Model",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-12",
+      "KPI": "Ring Session",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-12",
+      "KPI": "Risk taken",
+      "Rating": null,
+      "Note": ""
+    },
+    {
+      "Month": "2026-12",
+      "KPI": "Things learned about client",
+      "Rating": null,
+      "Note": ""
+    }
   ]
 }
