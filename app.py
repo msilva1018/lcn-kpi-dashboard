@@ -289,8 +289,9 @@ with st.sidebar:
 # --------------------------------------------------------------------------- #
 # Tabs
 # --------------------------------------------------------------------------- #
-tab1, tab2, tab3, tab4 = st.tabs(
-    ["📋 KPI Scorecard", "📈 Open Bids Pipeline", "🎯 Account Strategy", "🗓️ H2 Monthly Tracker"]
+tab1, tab_an, tab2, tab3, tab4 = st.tabs(
+    ["📋 KPI Scorecard", "🧭 Analyst KPIs", "📈 Open Bids Pipeline",
+     "🎯 Account Strategy", "🗓️ H2 Monthly Tracker"]
 )
 
 # ----- Tab 1: KPI Scorecard ------------------------------------------------- #
@@ -379,6 +380,92 @@ with tab1:
             })
         if new_defs:
             st.session_state.data["scorecard"] = new_defs
+
+# ----- Tab: Analyst KPIs ---------------------------------------------------- #
+with tab_an:
+    st.subheader("Analyst KPIs")
+    adefs = data["analyst"]
+    a_names = [a["KPI"] for a in adefs]
+
+    a_labels = [MONTH_LABELS[k] for k in MONTHS_KEYS]
+    a_sel_label = st.selectbox("Month", a_labels, index=a_labels.index(MONTH_LABELS[_default_month()]),
+                               key="an_month")
+    a_sel_month = MONTHS_KEYS[a_labels.index(a_sel_label)]
+    st.caption("Rate each part of the system 1–5 for the month, then capture the risk taken and what "
+               "you learned about the client. Switch months from the dropdown to track month over month.")
+
+    aidx = {(r["Month"], r["KPI"]): {"Rating": r.get("Rating"), "Note": r.get("Note", "")}
+            for r in data["analyst_months"]}
+
+    # 5 system components → ratings table (1–5) with a score bar and notes
+    rating_defs = [a for a in adefs if a.get("kind") == "rating"]
+    rows = []
+    for a in rating_defs:
+        cell = aidx.get((a_sel_month, a["KPI"]), {})
+        rv = cell.get("Rating")
+        rows.append({"System component": a["KPI"], "Rating (1–5)": rv,
+                     "Score": int((rv or 0) / 5 * 100) if isinstance(rv, (int, float)) else 0,
+                     "Notes": cell.get("Note", "")})
+    edited_an = st.data_editor(
+        pd.DataFrame(rows), key=f"an_grid_{a_sel_month}", use_container_width=True, hide_index=True,
+        disabled=["System component", "Score"],
+        column_config={
+            "System component": st.column_config.TextColumn("System component", width="medium"),
+            "Rating (1–5)": st.column_config.NumberColumn("Rating (1–5)", min_value=1, max_value=5, step=1, width="small"),
+            "Score": st.column_config.ProgressColumn("Score", min_value=0, max_value=100, format="%d%%"),
+            "Notes": st.column_config.TextColumn("Notes", width="large"),
+        },
+    )
+    for i, a in enumerate(rating_defs):
+        row = edited_an.iloc[i]
+        rt = row["Rating (1–5)"]
+        aidx[(a_sel_month, a["KPI"])] = {
+            "Rating": None if pd.isna(rt) else float(rt),
+            "Note": "" if pd.isna(row["Notes"]) else str(row["Notes"]),
+        }
+
+    # Risk taken → rating + explanation box
+    risk = next((a for a in adefs if a.get("kind") == "rating_note"), None)
+    if risk:
+        st.markdown(f"**{risk['KPI']}**")
+        cell = aidx.get((a_sel_month, risk["KPI"]), {})
+        cur = cell.get("Rating")
+        rc1, rc2 = st.columns([1, 3])
+        with rc1:
+            rt = st.number_input("Risk level (1–5, 0 = none)", min_value=0, max_value=5, step=1,
+                                 value=int(cur) if isinstance(cur, (int, float)) else 0,
+                                 key=f"risk_r_{a_sel_month}")
+        with rc2:
+            rnote = st.text_area("Explanation — risk taken this month", cell.get("Note", ""),
+                                 key=f"risk_n_{a_sel_month}", height=90)
+        aidx[(a_sel_month, risk["KPI"])] = {"Rating": float(rt) if rt else None, "Note": rnote}
+
+    # Things learned about client → explanation box
+    learn = next((a for a in adefs if a.get("kind") == "note"), None)
+    if learn:
+        st.markdown(f"**{learn['KPI']}**")
+        cell = aidx.get((a_sel_month, learn["KPI"]), {})
+        lnote = st.text_area("Explanation — things learned about the client this month",
+                             cell.get("Note", ""), key=f"learn_n_{a_sel_month}", height=110)
+        aidx[(a_sel_month, learn["KPI"])] = {"Rating": None, "Note": lnote}
+
+    # write back the full month × KPI grid, preserving other months
+    new_am = []
+    for mo in MONTHS_KEYS:
+        for nm in a_names:
+            c = aidx.get((mo, nm), {})
+            new_am.append({"Month": mo, "KPI": nm, "Rating": c.get("Rating"), "Note": c.get("Note", "")})
+    st.session_state.data["analyst_months"] = new_am
+
+    # month summary: average system rating
+    rv = [aidx.get((a_sel_month, a["KPI"]), {}).get("Rating") for a in rating_defs]
+    rv = [x for x in rv if isinstance(x, (int, float)) and x > 0]
+    avg = round(sum(rv) / len(rv), 1) if rv else 0
+    st.metric(f"Avg system rating ({a_sel_label})", f"{avg}/5")
+
+    with st.expander("ℹ️ What each KPI means"):
+        for a in adefs:
+            st.markdown(f"- **{a['KPI']}** — {a.get('desc', '')}")
 
 # ----- Tab 2: Open Bids Pipeline -------------------------------------------- #
 with tab2:
