@@ -274,12 +274,15 @@ class SheetsStore:
         seed = _seed()
         data = {}
         for name, header in SHEETS.items():
+            if name not in ROW_BUILDERS or name not in PARSERS:
+                data[name] = seed.get(name, [])
+                continue
             ws = self._ws(name)
             try:
                 values = ws.get_all_values()
                 if _needs_seed(values, header):
                     self._write(ws, header, ROW_BUILDERS[name](seed))
-                    data[name] = seed[name]
+                    data[name] = seed.get(name, [])
                 else:
                     data[name] = PARSERS[name](ws.get_all_records(), seed)
             except Exception:
@@ -289,7 +292,7 @@ class SheetsStore:
                     self._write(ws, header, ROW_BUILDERS[name](seed))
                 except Exception:
                     pass
-                data[name] = seed[name]
+                data[name] = seed.get(name, [])
         return data
 
     def save(self, data: dict):
