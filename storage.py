@@ -32,7 +32,7 @@ SHEETS = {
     "h2": ["kpi", "type", "target"] + MONTHS,
     "analysts": ["Analyst"],
     "tasks": ["Task", "desc"],
-    "analyst_tasks": ["Week", "Analyst", "Task", "Action", "Outcome", "Explanation"],
+    "analyst_tasks": ["Analyst", "Week", "Task", "Action", "Outcome", "Explanation"],
 }
 
 SCOPES = [
@@ -204,7 +204,7 @@ def _parse_tasks(records):
 
 
 def _rows_analyst_tasks(data):
-    return [[r.get("Week", ""), r.get("Analyst", ""), r.get("Task", ""),
+    return [[r.get("Analyst", ""), r.get("Week", ""), r.get("Task", ""),
              r.get("Action", "") or "", bool(r.get("Outcome")), r.get("Explanation", "") or ""]
             for r in data.get("analyst_tasks", [])]
 
@@ -263,46 +263,84 @@ class SheetsStore:
     def __init__(self, spreadsheet):
         self.sh = spreadsheet
 
-    def _ws(self, name):
+    @staticmethod
+    def _retry(fn, tries=5, base=1.2):
+        """Call fn(), retrying on transient Google API errors (429/5xx) with backoff."""
+        import time
         import gspread
-        try:
-            return self.sh.worksheet(name)
-        except gspread.WorksheetNotFound:
-            return self.sh.add_worksheet(title=name, rows=200, cols=20)
+        last = None
+        for i in range(tries):
+            try:
+                return fn()
+            except gspread.exceptions.APIError as e:
+                last = e
+                code = getattr(getattr(e, "response", None), "status_code", None)
+                if code in (429, 500, 502, 503):
+                    time.sleep(base * (2 ** i))
+                    continue
+                raise
+        raise last
+
+    @staticmethod
+    def _values_to_records(values):
+        if not values:
+            return []
+        header = [str(h).strip() for h in values[0]]
+        out = []
+        for row in values[1:]:
+            out.append({header[i]: (row[i] if i < len(row) else "") for i in range(len(header))})
+        return out
+
+    def _ws_map(self):
+        # ONE metadata call for all worksheets, instead of one per sheet
+        return {w.title: w for w in self._retry(self.sh.worksheets)}
+
+    def _get_or_create(self, ws_map, name):
+        ws = ws_map.get(name)
+        if ws is None:
+            ws = self._retry(lambda: self.sh.add_worksheet(title=name, rows=400, cols=26))
+            ws_map[name] = ws
+        return ws
 
     def load(self) -> dict:
         seed = _seed()
         data = {}
+        ws_map = self._ws_map()
         for name, header in SHEETS.items():
             if name not in ROW_BUILDERS or name not in PARSERS:
                 data[name] = seed.get(name, [])
                 continue
-            ws = self._ws(name)
+            ws = None
             try:
-                values = ws.get_all_values()
+                ws = self._get_or_create(ws_map, name)
+                values = self._retry(ws.get_all_values)
                 if _needs_seed(values, header):
                     self._write(ws, header, ROW_BUILDERS[name](seed))
                     data[name] = seed.get(name, [])
                 else:
-                    data[name] = PARSERS[name](ws.get_all_records(), seed)
+                    # parse from the values we already fetched (no second API read)
+                    data[name] = PARSERS[name](self._values_to_records(values), seed)
             except Exception:
-                # Self-heal: if a worksheet is malformed or from an older schema,
-                # rebuild it from the packaged seed rather than crashing the app.
+                # Self-heal: rebuild from the packaged seed rather than crashing.
                 try:
-                    self._write(ws, header, ROW_BUILDERS[name](seed))
+                    if ws is not None:
+                        self._write(ws, header, ROW_BUILDERS[name](seed))
                 except Exception:
                     pass
                 data[name] = seed.get(name, [])
         return data
 
     def save(self, data: dict):
+        ws_map = self._ws_map()
         for name, header in SHEETS.items():
-            self._write(self._ws(name), header, ROW_BUILDERS[name](data))
+            if name not in ROW_BUILDERS:
+                continue
+            ws = self._get_or_create(ws_map, name)
+            self._write(ws, header, ROW_BUILDERS[name](data))
 
-    @staticmethod
-    def _write(ws, headers, rows):
-        ws.clear()
-        ws.update([headers] + rows, value_input_option="USER_ENTERED")
+    def _write(self, ws, headers, rows):
+        self._retry(ws.clear)
+        self._retry(lambda: ws.update([headers] + rows, value_input_option="USER_ENTERED"))
 
 
 # --------------------------------------------------------------------------- #

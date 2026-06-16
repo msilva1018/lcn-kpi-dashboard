@@ -458,7 +458,7 @@ with tab1:
 with tab_an:
     st.subheader("Analyst KPIs")
     analysts = [a["Analyst"] for a in data["analysts"]]
-    tasks = [t["Task"] for t in data["tasks"]]
+    default_tasks = [t["Task"] for t in data["tasks"]]
 
     existing_weeks = {r.get("Week") for r in data["analyst_tasks"]}
     week_keys, cur_week = week_options(existing_weeks)
@@ -466,24 +466,33 @@ with tab_an:
     default_idx = week_keys.index(cur_week) if cur_week in week_keys else len(week_keys) - 1
     sel_wlabel = st.selectbox("Week", wlabels, index=default_idx, key="an_week")
     sel_week = week_keys[wlabels.index(sel_wlabel)]
-    st.caption("Each analyst tracks their Task KPIs for the week: the action and what success looks like, "
-               "whether the outcome was achieved (✓), and an explanation. Opens on the current week; "
-               "use the dropdown to view other weeks.")
+    st.caption("Each analyst tracks their tasks for the week: the task, the action and what success "
+               "looks like, whether the outcome was achieved (✓), and an explanation. Task names are "
+               "editable and you can add rows. Opens on the current week; use the dropdown for other weeks.")
 
-    tidx = {(r["Week"], r["Analyst"], r["Task"]): r for r in data["analyst_tasks"]}
+    # stored rows grouped by (week, analyst)
+    by_wa = {}
+    for r in data["analyst_tasks"]:
+        by_wa.setdefault((r.get("Week"), r.get("Analyst")), []).append(r)
 
+    cur_rows = []  # non-empty rows for the selected week, rebuilt from the editors
     for an in analysts:
         st.markdown(f"#### {an}")
-        rows = []
-        for t in tasks:
-            cell = tidx.get((sel_week, an, t), {})
-            rows.append({"Task": t,
-                         "Action": cell.get("Action", "") or "",
-                         "Outcome": bool(cell.get("Outcome", False)),
-                         "Explanation": cell.get("Explanation", "") or ""})
+        these = by_wa.get((sel_week, an), [])
+        by_task = {r.get("Task"): r for r in these}
+        display = []
+        for t in default_tasks:  # standard tasks first, in order, with any saved data
+            r = by_task.get(t, {})
+            display.append({"Task": t, "Action": r.get("Action", "") or "",
+                            "Outcome": bool(r.get("Outcome")), "Explanation": r.get("Explanation", "") or ""})
+        for r in these:  # any custom tasks the analyst added
+            if r.get("Task") not in set(default_tasks):
+                display.append({"Task": r.get("Task", ""), "Action": r.get("Action", "") or "",
+                                "Outcome": bool(r.get("Outcome")), "Explanation": r.get("Explanation", "") or ""})
+
         edited = st.data_editor(
-            pd.DataFrame(rows), key=f"an_{an}_{sel_week}", use_container_width=True, hide_index=True,
-            disabled=["Task"],
+            pd.DataFrame(display), key=f"an_{an}_{sel_week}", use_container_width=True, hide_index=True,
+            num_rows="dynamic",
             column_config={
                 "Task": st.column_config.TextColumn("Task", width="medium"),
                 "Action": st.column_config.TextColumn(
@@ -492,29 +501,26 @@ with tab_an:
                 "Explanation": st.column_config.TextColumn("Explanation", width="large"),
             },
         )
-        for i, t in enumerate(tasks):
-            row = edited.iloc[i]
-            tidx[(sel_week, an, t)] = {
-                "Week": sel_week, "Analyst": an, "Task": t,
-                "Action": "" if pd.isna(row["Action"]) else str(row["Action"]),
-                "Outcome": bool(row["Outcome"]),
-                "Explanation": "" if pd.isna(row["Explanation"]) else str(row["Explanation"]),
-            }
-        met = sum(1 for t in tasks if tidx.get((sel_week, an, t), {}).get("Outcome"))
-        st.caption(f"Outcomes achieved this week: **{met}/{len(tasks)}**")
+        met = total = 0
+        for _, row in edited.iterrows():
+            task = "" if pd.isna(row["Task"]) else str(row["Task"]).strip()
+            action = "" if pd.isna(row["Action"]) else str(row["Action"])
+            outcome = bool(row["Outcome"])
+            expl = "" if pd.isna(row["Explanation"]) else str(row["Explanation"])
+            if task:
+                total += 1
+            if outcome:
+                met += 1
+            if task or action.strip() or outcome or expl.strip():
+                cur_rows.append({"Week": sel_week, "Analyst": an, "Task": task,
+                                 "Action": action, "Outcome": outcome, "Explanation": expl})
+        st.caption(f"Outcomes achieved this week: **{met}/{total}**")
         st.divider()
 
-    # persist only non-empty entries (weeks are created on demand; keeps the Sheet small)
-    persisted = []
-    for (wk, an, tk), rec in tidx.items():
-        action = (rec.get("Action") or "").strip()
-        outcome = bool(rec.get("Outcome"))
-        expl = (rec.get("Explanation") or "").strip()
-        if action or outcome or expl:
-            persisted.append({"Week": wk, "Analyst": an, "Task": tk,
-                              "Action": rec.get("Action", ""), "Outcome": outcome,
-                              "Explanation": rec.get("Explanation", "")})
-    st.session_state.data["analyst_tasks"] = persisted
+    # keep every other week/analyst as-is; replace just the selected week's rows
+    kept = [r for r in data["analyst_tasks"]
+            if not (r.get("Week") == sel_week and r.get("Analyst") in analysts)]
+    st.session_state.data["analyst_tasks"] = kept + cur_rows
 
     with st.expander("⚙️ Manage analysts"):
         adf = pd.DataFrame({"Analyst": analysts})
@@ -526,7 +532,7 @@ with tab_an:
         if new_people:
             st.session_state.data["analysts"] = new_people
 
-    with st.expander("ℹ️ What each Task means"):
+    with st.expander("ℹ️ Suggested tasks"):
         for t in data["tasks"]:
             d = t.get("desc", "")
             st.markdown(f"- **{t['Task']}**" + (f" — {d}" if d else ""))
