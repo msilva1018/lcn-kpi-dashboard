@@ -6,6 +6,7 @@ Falls back to local data.json when Google Sheets secrets aren't configured.
 """
 import json
 import hashlib
+import hmac
 import copy
 from datetime import datetime
 
@@ -83,6 +84,39 @@ def numify(df, cols):
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
     return df
+
+
+def _password_configured():
+    try:
+        return bool(st.secrets.get("app_password"))
+    except Exception:
+        return False
+
+
+def check_password():
+    """Gate the app behind a shared password stored in st.secrets['app_password'].
+    Returns True once the correct password has been entered this session."""
+    def _entered():
+        if hmac.compare_digest(str(st.session_state.get("pw", "")),
+                               str(st.secrets["app_password"])):
+            st.session_state["auth_ok"] = True
+            st.session_state.pop("pw", None)  # never keep the raw password around
+        else:
+            st.session_state["auth_ok"] = False
+
+    if st.session_state.get("auth_ok"):
+        return True
+
+    st.markdown(
+        '<div class="lcn-band"><h1>2026 KPI Dashboard</h1>'
+        '<p>Enter the password to continue.</p></div>',
+        unsafe_allow_html=True,
+    )
+    st.text_input("Password", type="password", on_change=_entered, key="pw")
+    if st.session_state.get("auth_ok") is False:
+        st.error("Incorrect password.")
+    st.caption("Access is restricted. Contact the dashboard owner if you need the password.")
+    return False
 
 
 def numbers_df(rows, label):
@@ -176,6 +210,13 @@ st.markdown(
 
 
 # --------------------------------------------------------------------------- #
+# Password gate (active only when app_password is set in secrets)
+# --------------------------------------------------------------------------- #
+if _password_configured() and not check_password():
+    st.stop()
+
+
+# --------------------------------------------------------------------------- #
 # Storage / state
 # --------------------------------------------------------------------------- #
 def _hash(d):
@@ -256,6 +297,10 @@ st.markdown(
 # Sidebar
 # --------------------------------------------------------------------------- #
 with st.sidebar:
+    if _password_configured() and st.session_state.get("auth_ok"):
+        if st.button("🔒 Log out", use_container_width=True):
+            st.session_state.pop("auth_ok", None)
+            st.rerun()
     st.subheader("Data source")
     if store.persistent:
         st.success("🟢 Connected to Google Sheets — edits save permanently.")
@@ -395,121 +440,57 @@ with tab1:
 with tab_an:
     st.subheader("Analyst KPIs")
     analysts = [a["Analyst"] for a in data["analysts"]]
-    comp_names = [c["Component"] for c in data["components"]]
+    tasks = [t["Task"] for t in data["tasks"]]
 
     a_labels = [MONTH_LABELS[k] for k in MONTHS_KEYS]
     a_sel_label = st.selectbox("Month", a_labels, index=a_labels.index(MONTH_LABELS[_default_month()]),
                                key="an_month")
     a_sel_month = MONTHS_KEYS[a_labels.index(a_sel_label)]
+    st.caption("Each analyst tracks their Task KPIs for the month: the action and what success looks like, "
+               "whether the outcome was achieved (✓), and why. Switch months from the dropdown.")
 
-    # ---- System components: analysts (rows) x components (cols), counts in cells ----
-    st.markdown("##### System components")
-    st.caption("How many times each analyst performed each system component this month. "
-               "Switch months from the dropdown to track month over month.")
-    cidx = {(r["Month"], r["Analyst"], r["Component"]): r.get("Count") for r in data["analyst_components"]}
-    crows = []
+    tidx = {(r["Month"], r["Analyst"], r["Task"]): r for r in data["analyst_tasks"]}
+
     for an in analysts:
-        rec = {"Analyst": an}
-        tot = 0
-        for cn in comp_names:
-            v = cidx.get((a_sel_month, an, cn))
-            rec[cn] = v
-            if isinstance(v, (int, float)):
-                tot += v
-        rec["Total"] = tot
-        crows.append(rec)
-    ccfg = {"Analyst": st.column_config.TextColumn("Analyst", width="small")}
-    for cn in comp_names:
-        ccfg[cn] = st.column_config.NumberColumn(cn, min_value=0, step=1, format="%d", width="small")
-    ccfg["Total"] = st.column_config.NumberColumn("Total", format="%d", width="small")
-    edited_c = st.data_editor(
-        numify(pd.DataFrame(crows), comp_names + ["Total"]), key=f"an_comp_{a_sel_month}", use_container_width=True, hide_index=True,
-        disabled=["Analyst", "Total"], column_config=ccfg,
-    )
-    for i, an in enumerate(analysts):
-        row = edited_c.iloc[i]
-        for cn in comp_names:
-            v = row[cn]
-            cidx[(a_sel_month, an, cn)] = None if pd.isna(v) else float(v)
-    st.session_state.data["analyst_components"] = [
-        {"Month": mo, "Analyst": an, "Component": cn, "Count": cidx.get((mo, an, cn))}
-        for mo in MONTHS_KEYS for an in analysts for cn in comp_names
-    ]
-    month_total = sum(v for v in (cidx.get((a_sel_month, an, cn)) for an in analysts for cn in comp_names)
-                      if isinstance(v, (int, float)))
-    st.metric(f"Total system actions ({a_sel_label})", int(month_total))
+        st.markdown(f"#### {an}")
+        rows = []
+        for t in tasks:
+            cell = tidx.get((a_sel_month, an, t), {})
+            rows.append({"Task KPI": t,
+                         "Action": cell.get("Action", "") or "",
+                         "Outcome": bool(cell.get("Outcome", False)),
+                         "Why": cell.get("Why", "") or ""})
+        edited = st.data_editor(
+            pd.DataFrame(rows), key=f"an_{an}_{a_sel_month}", use_container_width=True, hide_index=True,
+            disabled=["Task KPI"],
+            column_config={
+                "Task KPI": st.column_config.TextColumn("Task KPI", width="medium"),
+                "Action": st.column_config.TextColumn(
+                    "Action (what they'll do / what success looks like)", width="large"),
+                "Outcome": st.column_config.CheckboxColumn("Outcome", width="small"),
+                "Why": st.column_config.TextColumn("Why", width="large"),
+            },
+        )
+        for i, t in enumerate(tasks):
+            row = edited.iloc[i]
+            tidx[(a_sel_month, an, t)] = {
+                "Month": a_sel_month, "Analyst": an, "Task": t,
+                "Action": "" if pd.isna(row["Action"]) else str(row["Action"]),
+                "Outcome": bool(row["Outcome"]),
+                "Why": "" if pd.isna(row["Why"]) else str(row["Why"]),
+            }
+        met = sum(1 for t in tasks if tidx.get((a_sel_month, an, t), {}).get("Outcome"))
+        st.caption(f"Outcomes achieved: **{met}/{len(tasks)}**")
+        st.divider()
 
-    # ---- Risk taken: 1 per analyst per month, with explanation ----
-    st.markdown("##### Risk taken")
-    st.caption("Target: **1 risk per analyst** this month. Log the count and explain the risk.")
-    ridx = {(r["Month"], r["Analyst"]): {"Count": r.get("Count"), "Explanation": r.get("Explanation", "")}
-            for r in data["analyst_risk"]}
-    rrows = []
-    for an in analysts:
-        c = ridx.get((a_sel_month, an), {})
-        rrows.append({"Analyst": an, "Risks taken": c.get("Count"), "Explanation": c.get("Explanation", "")})
-    edited_r = st.data_editor(
-        numify(pd.DataFrame(rrows), ["Risks taken"]), key=f"an_risk_{a_sel_month}", use_container_width=True, hide_index=True,
-        disabled=["Analyst"],
-        column_config={
-            "Analyst": st.column_config.TextColumn("Analyst", width="small"),
-            "Risks taken": st.column_config.NumberColumn("Risks taken", min_value=0, step=1, format="%d", width="small"),
-            "Explanation": st.column_config.TextColumn("Explanation", width="large"),
-        },
-    )
-    for i, an in enumerate(analysts):
-        row = edited_r.iloc[i]
-        rt = row["Risks taken"]
-        ridx[(a_sel_month, an)] = {
-            "Count": None if pd.isna(rt) else float(rt),
-            "Explanation": "" if pd.isna(row["Explanation"]) else str(row["Explanation"]),
-        }
-    st.session_state.data["analyst_risk"] = [
-        {"Month": mo, "Analyst": an, "Count": ridx.get((mo, an), {}).get("Count"),
-         "Explanation": ridx.get((mo, an), {}).get("Explanation", "")}
-        for mo in MONTHS_KEYS for an in analysts
+    # rebuild the full month × analyst × task set, preserving every month's data
+    st.session_state.data["analyst_tasks"] = [
+        tidx.get((mo, an, t),
+                 {"Month": mo, "Analyst": an, "Task": t, "Action": "", "Outcome": False, "Why": ""})
+        for mo in MONTHS_KEYS for an in analysts for t in tasks
     ]
-    risk_met = sum(1 for an in analysts if (ridx.get((a_sel_month, an), {}).get("Count") or 0) >= 1)
-    st.metric("Met risk target (\u22651)", f"{risk_met}/{len(analysts)}")
 
-    # ---- Things learned about client: 2 per analyst per month, two boxes each ----
-    st.markdown("##### Things learned about client")
-    st.caption("Target: **2 things per analyst** this month. Two boxes are provided for each analyst.")
-    lidx = {(r["Month"], r["Analyst"]): {"Count": r.get("Count"),
-                                         "L1": r.get("Learning 1", ""), "L2": r.get("Learning 2", "")}
-            for r in data["analyst_learned"]}
-    lrows = []
-    for an in analysts:
-        c = lidx.get((a_sel_month, an), {})
-        lrows.append({"Analyst": an, "Things learned": c.get("Count"),
-                      "Learning 1": c.get("L1", ""), "Learning 2": c.get("L2", "")})
-    edited_l = st.data_editor(
-        numify(pd.DataFrame(lrows), ["Things learned"]), key=f"an_learn_{a_sel_month}", use_container_width=True, hide_index=True,
-        disabled=["Analyst"],
-        column_config={
-            "Analyst": st.column_config.TextColumn("Analyst", width="small"),
-            "Things learned": st.column_config.NumberColumn("Things learned", min_value=0, step=1, format="%d", width="small"),
-            "Learning 1": st.column_config.TextColumn("Learning 1", width="large"),
-            "Learning 2": st.column_config.TextColumn("Learning 2", width="large"),
-        },
-    )
-    for i, an in enumerate(analysts):
-        row = edited_l.iloc[i]
-        lt = row["Things learned"]
-        lidx[(a_sel_month, an)] = {
-            "Count": None if pd.isna(lt) else float(lt),
-            "L1": "" if pd.isna(row["Learning 1"]) else str(row["Learning 1"]),
-            "L2": "" if pd.isna(row["Learning 2"]) else str(row["Learning 2"]),
-        }
-    st.session_state.data["analyst_learned"] = [
-        {"Month": mo, "Analyst": an, "Count": lidx.get((mo, an), {}).get("Count"),
-         "Learning 1": lidx.get((mo, an), {}).get("L1", ""), "Learning 2": lidx.get((mo, an), {}).get("L2", "")}
-        for mo in MONTHS_KEYS for an in analysts
-    ]
-    learn_met = sum(1 for an in analysts if (lidx.get((a_sel_month, an), {}).get("Count") or 0) >= 2)
-    st.metric("Met learning target (\u22652)", f"{learn_met}/{len(analysts)}")
-
-    with st.expander("\u2699\ufe0f Manage analysts"):
+    with st.expander("⚙️ Manage analysts"):
         adf = pd.DataFrame({"Analyst": analysts})
         ed_a = st.data_editor(adf, key="an_people", use_container_width=True, hide_index=True,
                               num_rows="dynamic",
@@ -519,9 +500,10 @@ with tab_an:
         if new_people:
             st.session_state.data["analysts"] = new_people
 
-    with st.expander("\u2139\ufe0f What each system component means"):
-        for c in data["components"]:
-            st.markdown(f"- **{c['Component']}** \u2014 {c.get('desc', '')}")
+    with st.expander("ℹ️ What each Task KPI means"):
+        for t in data["tasks"]:
+            d = t.get("desc", "")
+            st.markdown(f"- **{t['Task']}**" + (f" — {d}" if d else ""))
 
 
 # ----- Tab 2: Open Bids Pipeline -------------------------------------------- #

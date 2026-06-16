@@ -625,935 +625,1212 @@
       "Analyst": "Ethan"
     }
   ],
-  "components": [
+  "tasks": [
     {
-      "Component": "Command Engine",
+      "Task": "Command Engine",
       "desc": "Intentional, outcome-driven interactions. Maps research purpose to business decisions before work begins."
     },
     {
-      "Component": "Account Intelligence System",
+      "Task": "Account Intelligence",
       "desc": "Full client and stakeholder visibility. Context on decision pathways and organizational dynamics."
     },
     {
-      "Component": "Momentum Map",
-      "desc": "Execution alignment and forward motion. Visibility and progress across every milestone."
-    },
-    {
-      "Component": "Insights Model",
+      "Task": "Insights Model",
       "desc": "Adherence to operational process to derive insights versus findings."
     },
     {
-      "Component": "Ring Session",
+      "Task": "Ring Session",
       "desc": "Adversarial review and quality control. Every output challenged before delivery."
+    },
+    {
+      "Task": "Risk Taken (1 per month)",
+      "desc": "Take at least one meaningful risk this month."
+    },
+    {
+      "Task": "Client relationship (2 per month)",
+      "desc": "Deepen the client relationship at least twice this month."
+    },
+    {
+      "Task": "Other",
+      "desc": "Anything else worth tracking this month."
     }
   ],
-  "analyst_components": [
+  "analyst_tasks": [
     {
       "Month": "2026-06",
       "Analyst": "Lauren",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-06",
-      "Analyst": "Lauren",
-      "Component": "Account Intelligence System",
-      "Count": null
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Lauren",
-      "Component": "Momentum Map",
-      "Count": null
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Lauren",
-      "Component": "Insights Model",
-      "Count": null
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Lauren",
-      "Component": "Ring Session",
-      "Count": null
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-06",
+      "Analyst": "Lauren",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-06",
+      "Analyst": "Lauren",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-06",
+      "Analyst": "Lauren",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Brandon",
-      "Component": "Command Engine",
-      "Count": null
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Brandon",
-      "Component": "Account Intelligence System",
-      "Count": null
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Brandon",
-      "Component": "Momentum Map",
-      "Count": null
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Brandon",
-      "Component": "Insights Model",
-      "Count": null
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Brandon",
-      "Component": "Ring Session",
-      "Count": null
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
-      "Analyst": "Ethan",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-06",
-      "Analyst": "Ethan",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-06",
-      "Analyst": "Ethan",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-06",
-      "Analyst": "Ethan",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-06",
-      "Analyst": "Ethan",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Lauren",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Lauren",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Lauren",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Lauren",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Lauren",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
       "Analyst": "Brandon",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Brandon",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Brandon",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Brandon",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Brandon",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Ethan",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Ethan",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Ethan",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Ethan",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Ethan",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Lauren",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Lauren",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Lauren",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Lauren",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Lauren",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Brandon",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Brandon",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Brandon",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Brandon",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Brandon",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Ethan",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Ethan",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Ethan",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Ethan",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Ethan",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Lauren",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Lauren",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Lauren",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Lauren",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Lauren",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Brandon",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Brandon",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Brandon",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Brandon",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Brandon",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Ethan",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Ethan",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Ethan",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Ethan",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Ethan",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Lauren",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Lauren",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Lauren",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Lauren",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Lauren",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Brandon",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Brandon",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Brandon",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Brandon",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Brandon",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Ethan",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Ethan",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Ethan",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Ethan",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Ethan",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Lauren",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Lauren",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Lauren",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Lauren",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Lauren",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Brandon",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Brandon",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Brandon",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Brandon",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Brandon",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Ethan",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Ethan",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Ethan",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Ethan",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Ethan",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Lauren",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Lauren",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Lauren",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Lauren",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Lauren",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Brandon",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Brandon",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Brandon",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Brandon",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Brandon",
-      "Component": "Ring Session",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Ethan",
-      "Component": "Command Engine",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Ethan",
-      "Component": "Account Intelligence System",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Ethan",
-      "Component": "Momentum Map",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Ethan",
-      "Component": "Insights Model",
-      "Count": null
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Ethan",
-      "Component": "Ring Session",
-      "Count": null
-    }
-  ],
-  "analyst_risk": [
-    {
-      "Month": "2026-06",
-      "Analyst": "Lauren",
-      "Count": null,
-      "Explanation": ""
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Brandon",
-      "Count": null,
-      "Explanation": ""
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Ethan",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Lauren",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Brandon",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-07",
-      "Analyst": "Ethan",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Lauren",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Brandon",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-08",
-      "Analyst": "Ethan",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Lauren",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Brandon",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-09",
-      "Analyst": "Ethan",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Lauren",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Brandon",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-10",
-      "Analyst": "Ethan",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Lauren",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Brandon",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-11",
-      "Analyst": "Ethan",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Lauren",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Brandon",
-      "Count": null,
-      "Explanation": ""
-    },
-    {
-      "Month": "2026-12",
-      "Analyst": "Ethan",
-      "Count": null,
-      "Explanation": ""
-    }
-  ],
-  "analyst_learned": [
-    {
-      "Month": "2026-06",
-      "Analyst": "Lauren",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
-    },
-    {
-      "Month": "2026-06",
-      "Analyst": "Brandon",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-06",
       "Analyst": "Ethan",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-06",
+      "Analyst": "Ethan",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-06",
+      "Analyst": "Ethan",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-06",
+      "Analyst": "Ethan",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-06",
+      "Analyst": "Ethan",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-06",
+      "Analyst": "Ethan",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-07",
       "Analyst": "Lauren",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Lauren",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Lauren",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Lauren",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Lauren",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Lauren",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Lauren",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-07",
       "Analyst": "Brandon",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Brandon",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Brandon",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Brandon",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Brandon",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Brandon",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Brandon",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-07",
       "Analyst": "Ethan",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Ethan",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Ethan",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Ethan",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Ethan",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Ethan",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-07",
+      "Analyst": "Ethan",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-08",
       "Analyst": "Lauren",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Lauren",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Lauren",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Lauren",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Lauren",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Lauren",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Lauren",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-08",
       "Analyst": "Brandon",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Brandon",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Brandon",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Brandon",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Brandon",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Brandon",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Brandon",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-08",
       "Analyst": "Ethan",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Ethan",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Ethan",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Ethan",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Ethan",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Ethan",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-08",
+      "Analyst": "Ethan",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-09",
       "Analyst": "Lauren",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Lauren",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Lauren",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Lauren",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Lauren",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Lauren",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Lauren",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-09",
       "Analyst": "Brandon",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Brandon",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Brandon",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Brandon",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Brandon",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Brandon",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Brandon",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-09",
       "Analyst": "Ethan",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Ethan",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Ethan",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Ethan",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Ethan",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Ethan",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-09",
+      "Analyst": "Ethan",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-10",
       "Analyst": "Lauren",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Lauren",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Lauren",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Lauren",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Lauren",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Lauren",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Lauren",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-10",
       "Analyst": "Brandon",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Brandon",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Brandon",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Brandon",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Brandon",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Brandon",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Brandon",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-10",
       "Analyst": "Ethan",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Ethan",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Ethan",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Ethan",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Ethan",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Ethan",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-10",
+      "Analyst": "Ethan",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-11",
       "Analyst": "Lauren",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Lauren",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Lauren",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Lauren",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Lauren",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Lauren",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Lauren",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-11",
       "Analyst": "Brandon",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Brandon",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Brandon",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Brandon",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Brandon",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Brandon",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Brandon",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-11",
       "Analyst": "Ethan",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Ethan",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Ethan",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Ethan",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Ethan",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Ethan",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-11",
+      "Analyst": "Ethan",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-12",
       "Analyst": "Lauren",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Lauren",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Lauren",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Lauren",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Lauren",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Lauren",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Lauren",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-12",
       "Analyst": "Brandon",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Brandon",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Brandon",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Brandon",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Brandon",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Brandon",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Brandon",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     },
     {
       "Month": "2026-12",
       "Analyst": "Ethan",
-      "Count": null,
-      "Learning 1": "",
-      "Learning 2": ""
+      "Task": "Command Engine",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Ethan",
+      "Task": "Account Intelligence",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Ethan",
+      "Task": "Insights Model",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Ethan",
+      "Task": "Ring Session",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Ethan",
+      "Task": "Risk Taken (1 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Ethan",
+      "Task": "Client relationship (2 per month)",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
+    },
+    {
+      "Month": "2026-12",
+      "Analyst": "Ethan",
+      "Task": "Other",
+      "Action": "",
+      "Outcome": false,
+      "Why": ""
     }
   ]
 }
