@@ -8,7 +8,7 @@ import json
 import hashlib
 import hmac
 import copy
-from datetime import datetime
+from datetime import datetime, timedelta, date
 
 import pandas as pd
 import streamlit as st
@@ -32,6 +32,24 @@ LABEL_TO_AGG = {"Sum": "sum", "Snapshot": "snapshot"}
 def _default_month():
     key = f"{datetime.now().year}-{datetime.now().month:02d}"
     return key if key in MONTHS_KEYS else MONTHS_KEYS[0]
+
+
+def week_label(monday_iso):
+    """'Jun 15–21, 2026' style label for a week starting on the given Monday."""
+    mon = date.fromisoformat(monday_iso)
+    sun = mon + timedelta(days=6)
+    if mon.month == sun.month:
+        return f"{mon:%b} {mon.day}\u2013{sun.day}, {sun.year}"
+    return f"{mon:%b} {mon.day} \u2013 {sun:%b} {sun.day}, {sun.year}"
+
+
+def week_options(existing_weeks):
+    """Return (sorted week-start keys, current week key). Always includes the
+    current week, a window around it, and any week that already has data."""
+    cur_mon = date.today() - timedelta(days=date.today().weekday())
+    weeks = {(cur_mon + timedelta(weeks=i)).isoformat() for i in range(-16, 9)}
+    weeks |= {w for w in existing_weeks if w}
+    return sorted(weeks), cur_mon.isoformat()
 
 
 def weeks_index(weeks_rows):
@@ -442,53 +460,61 @@ with tab_an:
     analysts = [a["Analyst"] for a in data["analysts"]]
     tasks = [t["Task"] for t in data["tasks"]]
 
-    a_labels = [MONTH_LABELS[k] for k in MONTHS_KEYS]
-    a_sel_label = st.selectbox("Month", a_labels, index=a_labels.index(MONTH_LABELS[_default_month()]),
-                               key="an_month")
-    a_sel_month = MONTHS_KEYS[a_labels.index(a_sel_label)]
-    st.caption("Each analyst tracks their Task KPIs for the month: the action and what success looks like, "
-               "whether the outcome was achieved (✓), and why. Switch months from the dropdown.")
+    existing_weeks = {r.get("Week") for r in data["analyst_tasks"]}
+    week_keys, cur_week = week_options(existing_weeks)
+    wlabels = [week_label(w) for w in week_keys]
+    default_idx = week_keys.index(cur_week) if cur_week in week_keys else len(week_keys) - 1
+    sel_wlabel = st.selectbox("Week", wlabels, index=default_idx, key="an_week")
+    sel_week = week_keys[wlabels.index(sel_wlabel)]
+    st.caption("Each analyst tracks their Task KPIs for the week: the action and what success looks like, "
+               "whether the outcome was achieved (✓), and an explanation. Opens on the current week; "
+               "use the dropdown to view other weeks.")
 
-    tidx = {(r["Month"], r["Analyst"], r["Task"]): r for r in data["analyst_tasks"]}
+    tidx = {(r["Week"], r["Analyst"], r["Task"]): r for r in data["analyst_tasks"]}
 
     for an in analysts:
         st.markdown(f"#### {an}")
         rows = []
         for t in tasks:
-            cell = tidx.get((a_sel_month, an, t), {})
-            rows.append({"Task KPI": t,
+            cell = tidx.get((sel_week, an, t), {})
+            rows.append({"Task": t,
                          "Action": cell.get("Action", "") or "",
                          "Outcome": bool(cell.get("Outcome", False)),
-                         "Why": cell.get("Why", "") or ""})
+                         "Explanation": cell.get("Explanation", "") or ""})
         edited = st.data_editor(
-            pd.DataFrame(rows), key=f"an_{an}_{a_sel_month}", use_container_width=True, hide_index=True,
-            disabled=["Task KPI"],
+            pd.DataFrame(rows), key=f"an_{an}_{sel_week}", use_container_width=True, hide_index=True,
+            disabled=["Task"],
             column_config={
-                "Task KPI": st.column_config.TextColumn("Task KPI", width="medium"),
+                "Task": st.column_config.TextColumn("Task", width="medium"),
                 "Action": st.column_config.TextColumn(
-                    "Action (what they'll do / what success looks like)", width="large"),
+                    "Action (what you'll do / what success looks like)", width="large"),
                 "Outcome": st.column_config.CheckboxColumn("Outcome", width="small"),
-                "Why": st.column_config.TextColumn("Why", width="large"),
+                "Explanation": st.column_config.TextColumn("Explanation", width="large"),
             },
         )
         for i, t in enumerate(tasks):
             row = edited.iloc[i]
-            tidx[(a_sel_month, an, t)] = {
-                "Month": a_sel_month, "Analyst": an, "Task": t,
+            tidx[(sel_week, an, t)] = {
+                "Week": sel_week, "Analyst": an, "Task": t,
                 "Action": "" if pd.isna(row["Action"]) else str(row["Action"]),
                 "Outcome": bool(row["Outcome"]),
-                "Why": "" if pd.isna(row["Why"]) else str(row["Why"]),
+                "Explanation": "" if pd.isna(row["Explanation"]) else str(row["Explanation"]),
             }
-        met = sum(1 for t in tasks if tidx.get((a_sel_month, an, t), {}).get("Outcome"))
-        st.caption(f"Outcomes achieved: **{met}/{len(tasks)}**")
+        met = sum(1 for t in tasks if tidx.get((sel_week, an, t), {}).get("Outcome"))
+        st.caption(f"Outcomes achieved this week: **{met}/{len(tasks)}**")
         st.divider()
 
-    # rebuild the full month × analyst × task set, preserving every month's data
-    st.session_state.data["analyst_tasks"] = [
-        tidx.get((mo, an, t),
-                 {"Month": mo, "Analyst": an, "Task": t, "Action": "", "Outcome": False, "Why": ""})
-        for mo in MONTHS_KEYS for an in analysts for t in tasks
-    ]
+    # persist only non-empty entries (weeks are created on demand; keeps the Sheet small)
+    persisted = []
+    for (wk, an, tk), rec in tidx.items():
+        action = (rec.get("Action") or "").strip()
+        outcome = bool(rec.get("Outcome"))
+        expl = (rec.get("Explanation") or "").strip()
+        if action or outcome or expl:
+            persisted.append({"Week": wk, "Analyst": an, "Task": tk,
+                              "Action": rec.get("Action", ""), "Outcome": outcome,
+                              "Explanation": rec.get("Explanation", "")})
+    st.session_state.data["analyst_tasks"] = persisted
 
     with st.expander("⚙️ Manage analysts"):
         adf = pd.DataFrame({"Analyst": analysts})
@@ -500,7 +526,7 @@ with tab_an:
         if new_people:
             st.session_state.data["analysts"] = new_people
 
-    with st.expander("ℹ️ What each Task KPI means"):
+    with st.expander("ℹ️ What each Task means"):
         for t in data["tasks"]:
             d = t.get("desc", "")
             st.markdown(f"- **{t['Task']}**" + (f" — {d}" if d else ""))

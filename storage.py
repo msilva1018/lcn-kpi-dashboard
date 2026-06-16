@@ -32,7 +32,7 @@ SHEETS = {
     "h2": ["kpi", "type", "target"] + MONTHS,
     "analysts": ["Analyst"],
     "tasks": ["Task", "desc"],
-    "analyst_tasks": ["Month", "Analyst", "Task", "Action", "Outcome", "Why"],
+    "analyst_tasks": ["Week", "Analyst", "Task", "Action", "Outcome", "Explanation"],
 }
 
 SCOPES = [
@@ -204,15 +204,15 @@ def _parse_tasks(records):
 
 
 def _rows_analyst_tasks(data):
-    return [[r.get("Month", ""), r.get("Analyst", ""), r.get("Task", ""),
-             r.get("Action", "") or "", bool(r.get("Outcome")), r.get("Why", "") or ""]
+    return [[r.get("Week", ""), r.get("Analyst", ""), r.get("Task", ""),
+             r.get("Action", "") or "", bool(r.get("Outcome")), r.get("Explanation", "") or ""]
             for r in data.get("analyst_tasks", [])]
 
 
 def _parse_analyst_tasks(records):
-    return [{"Month": r.get("Month", "") or "", "Analyst": r.get("Analyst", "") or "",
+    return [{"Week": r.get("Week", "") or "", "Analyst": r.get("Analyst", "") or "",
              "Task": r.get("Task", "") or "", "Action": (r.get("Action") or ""),
-             "Outcome": _to_bool(r.get("Outcome")), "Why": (r.get("Why") or "")}
+             "Outcome": _to_bool(r.get("Outcome")), "Explanation": (r.get("Explanation") or "")}
             for r in records]
 
 
