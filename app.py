@@ -458,7 +458,7 @@ with tab1:
 with tab_an:
     st.subheader("Analyst KPIs")
     analysts = [a["Analyst"] for a in data["analysts"]]
-    kpis = [t["Task"] for t in data["tasks"]]  # fixed KPI categories = row titles
+    kpis = [t["Task"] for t in data["tasks"]]
 
     existing_weeks = {r.get("Week") for r in data["analyst_tasks"]}
     week_keys, cur_week = week_options(existing_weeks)
@@ -466,58 +466,52 @@ with tab_an:
     default_idx = week_keys.index(cur_week) if cur_week in week_keys else len(week_keys) - 1
     sel_wlabel = st.selectbox("Week", wlabels, index=default_idx, key="an_week")
     sel_week = week_keys[wlabels.index(sel_wlabel)]
-    st.caption("The KPI categories run down the left as row titles. For each one, fill in the **Task** "
-               "(what you'll do), the **Action** / what success looks like, tick the **Outcome** when "
-               "achieved, and add an **Explanation**. Opens on the current week; use the dropdown for others.")
+    st.caption("Each KPI category has its own block. Fill in the Task (what you'll do), the Action / "
+               "what success looks like, tick Outcome when achieved, and add an Explanation. The text "
+               "boxes wrap and resize, so you always see the full entry. Opens on the current week.")
 
-    # stored rows grouped by (week, analyst), keyed by the KPI category row title
     by_wa = {}
     for r in data["analyst_tasks"]:
         by_wa.setdefault((r.get("Week"), r.get("Analyst")), {})[r.get("Task KPI")] = r
 
-    cur_rows = []  # non-empty rows for the selected week, rebuilt from the editors
+    new_entries = []
     for an in analysts:
-        st.markdown(f"#### {an}")
+        st.markdown(f"### {an}")
         saved = by_wa.get((sel_week, an), {})
-        body = []
-        for k in kpis:
-            r = saved.get(k, {})
-            body.append({"Task KPI": k, "Task": r.get("Task", "") or "", "Action": r.get("Action", "") or "",
-                         "Outcome": bool(r.get("Outcome")), "Explanation": r.get("Explanation", "") or ""})
-        df = pd.DataFrame(body)
-        edited = st.data_editor(
-            df, key=f"an_{an}_{sel_week}", use_container_width=True, hide_index=True,
-            disabled=["Task KPI"],
-            column_config={
-                "Task KPI": st.column_config.TextColumn("Task KPI", width="medium"),
-                "Task": st.column_config.TextColumn("Task", width="medium"),
-                "Action": st.column_config.TextColumn(
-                    "Action (what you'll do / what success looks like)", width="large"),
-                "Outcome": st.column_config.CheckboxColumn("Outcome", width="small"),
-                "Explanation": st.column_config.TextColumn("Explanation", width="large"),
-            },
-        )
-        met = 0
-        for i, k in enumerate(kpis):
-            row = edited.iloc[i]
-            task = "" if pd.isna(row["Task"]) else str(row["Task"])
-            action = "" if pd.isna(row["Action"]) else str(row["Action"])
-            outcome = bool(row["Outcome"])
-            expl = "" if pd.isna(row["Explanation"]) else str(row["Explanation"])
+        done = 0
+        for kpi in kpis:
+            cell = saved.get(kpi, {})
+            with st.container(border=True):
+                head = st.columns([5, 1])
+                head[0].markdown(f"**{kpi}**")
+                outcome = head[1].checkbox("Done \u2713", value=bool(cell.get("Outcome")),
+                                           key=f"an_o_{an}_{sel_week}_{kpi}")
+                cc = st.columns(2)
+                task = cc[0].text_area("Task", value=cell.get("Task", "") or "",
+                                       key=f"an_t_{an}_{sel_week}_{kpi}", height=90,
+                                       placeholder="What you'll do")
+                action = cc[1].text_area("Action \u2014 what you'll do / what success looks like",
+                                         value=cell.get("Action", "") or "",
+                                         key=f"an_a_{an}_{sel_week}_{kpi}", height=90,
+                                         placeholder="The plan, and what success looks like")
+                expl = st.text_area("Explanation", value=cell.get("Explanation", "") or "",
+                                    key=f"an_e_{an}_{sel_week}_{kpi}", height=80,
+                                    placeholder="What happened / why")
             if outcome:
-                met += 1
+                done += 1
             if task.strip() or action.strip() or outcome or expl.strip():
-                cur_rows.append({"Analyst": an, "Week": sel_week, "Task KPI": k, "Task": task,
-                                 "Action": action, "Outcome": outcome, "Explanation": expl})
-        st.caption(f"Outcomes achieved this week: **{met}/{len(kpis)}**")
+                new_entries.append({"Analyst": an, "Week": sel_week, "Task KPI": kpi,
+                                    "Task": task, "Action": action, "Outcome": outcome,
+                                    "Explanation": expl})
+        st.caption(f"Outcomes achieved this week: **{done}/{len(kpis)}**")
         st.divider()
 
     # keep every other week/analyst as-is; replace just the selected week's rows
     kept = [r for r in data["analyst_tasks"]
             if not (r.get("Week") == sel_week and r.get("Analyst") in analysts)]
-    st.session_state.data["analyst_tasks"] = kept + cur_rows
+    st.session_state.data["analyst_tasks"] = kept + new_entries
 
-    with st.expander("⚙️ Manage analysts"):
+    with st.expander("\u2699\ufe0f Manage analysts"):
         adf = pd.DataFrame({"Analyst": analysts})
         ed_a = st.data_editor(adf, key="an_people", use_container_width=True, hide_index=True,
                               num_rows="dynamic",
@@ -527,10 +521,10 @@ with tab_an:
         if new_people:
             st.session_state.data["analysts"] = new_people
 
-    with st.expander("ℹ️ What each KPI category means"):
+    with st.expander("\u2139\ufe0f What each KPI category means"):
         for t in data["tasks"]:
             d = t.get("desc", "")
-            st.markdown(f"- **{t['Task']}**" + (f" — {d}" if d else ""))
+            st.markdown(f"- **{t['Task']}**" + (f" \u2014 {d}" if d else ""))
 
 
 # ----- Tab 2: Open Bids Pipeline -------------------------------------------- #
