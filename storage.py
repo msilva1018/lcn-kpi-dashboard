@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import copy
 
 import streamlit as st
@@ -32,8 +33,17 @@ SHEETS = {
     "h2": ["kpi", "type", "target"] + MONTHS,
     "analysts": ["Analyst"],
     "tasks": ["Task", "desc"],
-    "analyst_tasks": ["Analyst", "Week", "Task KPI", "Task", "Action", "Outcome", "Explanation"],
 }
+
+# Each analyst gets their own worksheet (tab) so the Sheet shows an individual
+# breakdown per analyst. These tabs are handled separately from SHEETS above.
+ANALYST_HEADER = ["Week", "Task KPI", "Task", "Action", "Outcome", "Explanation"]
+
+
+def _safe_title(name):
+    """A valid Google Sheets worksheet title for an analyst name."""
+    t = re.sub(r"[:\\/?*\[\]]", " ", str(name)).strip()[:90]
+    return t or "Analyst"
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -225,7 +235,6 @@ PARSERS = {
     "h2": lambda recs, seed: _parse_h2(recs),
     "analysts": lambda recs, seed: _parse_analysts(recs),
     "tasks": lambda recs, seed: _parse_tasks(recs),
-    "analyst_tasks": lambda recs, seed: _parse_analyst_tasks(recs),
 }
 ROW_BUILDERS = {
     "scorecard": _rows_scorecard,
@@ -235,7 +244,6 @@ ROW_BUILDERS = {
     "h2": _rows_h2,
     "analysts": _rows_analysts,
     "tasks": _rows_tasks,
-    "analyst_tasks": _rows_analyst_tasks,
 }
 
 
@@ -329,6 +337,27 @@ class SheetsStore:
                 except Exception:
                     pass
                 data[name] = seed.get(name, [])
+
+        # Per-analyst breakdown: read one worksheet per analyst
+        data["analyst_tasks"] = []
+        for a in data.get("analysts", []):
+            name = (a.get("Analyst") or "").strip()
+            if not name:
+                continue
+            try:
+                ws = self._get_or_create(ws_map, _safe_title(name))
+                values = self._retry(ws.get_all_values)
+                if _needs_seed(values, ANALYST_HEADER):
+                    self._write(ws, ANALYST_HEADER, [])
+                    continue
+                for rec in self._values_to_records(values):
+                    data["analyst_tasks"].append({
+                        "Analyst": name, "Week": rec.get("Week", "") or "",
+                        "Task KPI": rec.get("Task KPI", "") or "", "Task": rec.get("Task", "") or "",
+                        "Action": rec.get("Action", "") or "", "Outcome": _to_bool(rec.get("Outcome")),
+                        "Explanation": rec.get("Explanation", "") or ""})
+            except Exception:
+                pass
         return data
 
     def save(self, data: dict):
@@ -338,6 +367,20 @@ class SheetsStore:
                 continue
             ws = self._get_or_create(ws_map, name)
             self._write(ws, header, ROW_BUILDERS[name](data))
+
+        # Per-analyst breakdown: write one worksheet per analyst
+        by_analyst = {}
+        for r in data.get("analyst_tasks", []):
+            by_analyst.setdefault((r.get("Analyst") or "").strip(), []).append(r)
+        for a in data.get("analysts", []):
+            name = (a.get("Analyst") or "").strip()
+            if not name:
+                continue
+            ws = self._get_or_create(ws_map, _safe_title(name))
+            rows = [[r.get("Week", ""), r.get("Task KPI", ""), r.get("Task", "") or "",
+                     r.get("Action", "") or "", bool(r.get("Outcome")), r.get("Explanation", "") or ""]
+                    for r in by_analyst.get(name, [])]
+            self._write(ws, ANALYST_HEADER, rows)
 
     def _write(self, ws, headers, rows):
         self._retry(ws.clear)
