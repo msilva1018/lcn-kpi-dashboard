@@ -458,7 +458,7 @@ with tab1:
 with tab_an:
     st.subheader("Analyst KPIs")
     analysts = [a["Analyst"] for a in data["analysts"]]
-    default_tasks = [t["Task"] for t in data["tasks"]]
+    kpis = [t["Task"] for t in data["tasks"]]  # fixed KPI categories = row titles
 
     existing_weeks = {r.get("Week") for r in data["analyst_tasks"]}
     week_keys, cur_week = week_options(existing_weeks)
@@ -466,34 +466,30 @@ with tab_an:
     default_idx = week_keys.index(cur_week) if cur_week in week_keys else len(week_keys) - 1
     sel_wlabel = st.selectbox("Week", wlabels, index=default_idx, key="an_week")
     sel_week = week_keys[wlabels.index(sel_wlabel)]
-    st.caption("Each analyst tracks their tasks for the week: the task, the action and what success "
-               "looks like, whether the outcome was achieved (✓), and an explanation. Task names are "
-               "editable and you can add rows. Opens on the current week; use the dropdown for other weeks.")
+    st.caption("The KPI categories run down the left as row titles. For each one, fill in the **Task** "
+               "(what you'll do), the **Action** / what success looks like, tick the **Outcome** when "
+               "achieved, and add an **Explanation**. Opens on the current week; use the dropdown for others.")
 
-    # stored rows grouped by (week, analyst)
+    # stored rows grouped by (week, analyst), keyed by the KPI category row title
     by_wa = {}
     for r in data["analyst_tasks"]:
-        by_wa.setdefault((r.get("Week"), r.get("Analyst")), []).append(r)
+        by_wa.setdefault((r.get("Week"), r.get("Analyst")), {})[r.get("Task KPI")] = r
 
     cur_rows = []  # non-empty rows for the selected week, rebuilt from the editors
     for an in analysts:
         st.markdown(f"#### {an}")
-        these = by_wa.get((sel_week, an), [])
-        by_task = {r.get("Task"): r for r in these}
-        display = []
-        for t in default_tasks:  # standard tasks first, in order, with any saved data
-            r = by_task.get(t, {})
-            display.append({"Task": t, "Action": r.get("Action", "") or "",
-                            "Outcome": bool(r.get("Outcome")), "Explanation": r.get("Explanation", "") or ""})
-        for r in these:  # any custom tasks the analyst added
-            if r.get("Task") not in set(default_tasks):
-                display.append({"Task": r.get("Task", ""), "Action": r.get("Action", "") or "",
-                                "Outcome": bool(r.get("Outcome")), "Explanation": r.get("Explanation", "") or ""})
-
+        saved = by_wa.get((sel_week, an), {})
+        body = []
+        for k in kpis:
+            r = saved.get(k, {})
+            body.append({"Task KPI": k, "Task": r.get("Task", "") or "", "Action": r.get("Action", "") or "",
+                         "Outcome": bool(r.get("Outcome")), "Explanation": r.get("Explanation", "") or ""})
+        df = pd.DataFrame(body)
         edited = st.data_editor(
-            pd.DataFrame(display), key=f"an_{an}_{sel_week}", use_container_width=True, hide_index=True,
-            num_rows="dynamic",
+            df, key=f"an_{an}_{sel_week}", use_container_width=True, hide_index=True,
+            disabled=["Task KPI"],
             column_config={
+                "Task KPI": st.column_config.TextColumn("Task KPI", width="medium"),
                 "Task": st.column_config.TextColumn("Task", width="medium"),
                 "Action": st.column_config.TextColumn(
                     "Action (what you'll do / what success looks like)", width="large"),
@@ -501,20 +497,19 @@ with tab_an:
                 "Explanation": st.column_config.TextColumn("Explanation", width="large"),
             },
         )
-        met = total = 0
-        for _, row in edited.iterrows():
-            task = "" if pd.isna(row["Task"]) else str(row["Task"]).strip()
+        met = 0
+        for i, k in enumerate(kpis):
+            row = edited.iloc[i]
+            task = "" if pd.isna(row["Task"]) else str(row["Task"])
             action = "" if pd.isna(row["Action"]) else str(row["Action"])
             outcome = bool(row["Outcome"])
             expl = "" if pd.isna(row["Explanation"]) else str(row["Explanation"])
-            if task:
-                total += 1
             if outcome:
                 met += 1
-            if task or action.strip() or outcome or expl.strip():
-                cur_rows.append({"Week": sel_week, "Analyst": an, "Task": task,
+            if task.strip() or action.strip() or outcome or expl.strip():
+                cur_rows.append({"Analyst": an, "Week": sel_week, "Task KPI": k, "Task": task,
                                  "Action": action, "Outcome": outcome, "Explanation": expl})
-        st.caption(f"Outcomes achieved this week: **{met}/{total}**")
+        st.caption(f"Outcomes achieved this week: **{met}/{len(kpis)}**")
         st.divider()
 
     # keep every other week/analyst as-is; replace just the selected week's rows
@@ -532,7 +527,7 @@ with tab_an:
         if new_people:
             st.session_state.data["analysts"] = new_people
 
-    with st.expander("ℹ️ Suggested tasks"):
+    with st.expander("ℹ️ What each KPI category means"):
         for t in data["tasks"]:
             d = t.get("desc", "")
             st.markdown(f"- **{t['Task']}**" + (f" — {d}" if d else ""))
