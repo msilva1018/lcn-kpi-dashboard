@@ -16,6 +16,7 @@ import json
 import os
 import re
 import copy
+from datetime import date, timedelta
 
 import streamlit as st
 
@@ -44,6 +45,18 @@ def _safe_title(name):
     """A valid Google Sheets worksheet title for an analyst name."""
     t = re.sub(r"[:\\/?*\[\]]", " ", str(name)).strip()[:90]
     return t or "Analyst"
+
+
+def _tracking_weeks():
+    """Monday-dated weeks the dashboard offers and the Sheet pre-fills (kept in
+    sync with app.py's week dropdown)."""
+    cur = date.today() - timedelta(days=date.today().weekday())
+    return [(cur + timedelta(weeks=i)).isoformat() for i in range(-2, 13)]
+
+
+def _blank_grid(kpis):
+    """A pre-filled Week x Task KPI grid with empty entry columns."""
+    return [[wk, kpi, "", "", False, ""] for wk in _tracking_weeks() for kpi in kpis]
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -338,7 +351,10 @@ class SheetsStore:
                     pass
                 data[name] = seed.get(name, [])
 
-        # Per-analyst breakdown: read one worksheet per analyst
+        # Per-analyst breakdown: one worksheet per analyst, pre-filled with the
+        # Week x Task KPI grid. Only rows that actually have entries are loaded
+        # back into the app (the blank grid stays in the Sheet as the template).
+        kpis = [t.get("Task", "") for t in data.get("tasks", []) if t.get("Task")]
         data["analyst_tasks"] = []
         for a in data.get("analysts", []):
             name = (a.get("Analyst") or "").strip()
@@ -348,14 +364,18 @@ class SheetsStore:
                 ws = self._get_or_create(ws_map, _safe_title(name))
                 values = self._retry(ws.get_all_values)
                 if _needs_seed(values, ANALYST_HEADER):
-                    self._write(ws, ANALYST_HEADER, [])
+                    self._write(ws, ANALYST_HEADER, _blank_grid(kpis))
                     continue
                 for rec in self._values_to_records(values):
-                    data["analyst_tasks"].append({
-                        "Analyst": name, "Week": rec.get("Week", "") or "",
-                        "Task KPI": rec.get("Task KPI", "") or "", "Task": rec.get("Task", "") or "",
-                        "Action": rec.get("Action", "") or "", "Outcome": _to_bool(rec.get("Outcome")),
-                        "Explanation": rec.get("Explanation", "") or ""})
+                    task = rec.get("Task", "") or ""
+                    action = rec.get("Action", "") or ""
+                    outcome = _to_bool(rec.get("Outcome"))
+                    expl = rec.get("Explanation", "") or ""
+                    if task.strip() or action.strip() or outcome or expl.strip():
+                        data["analyst_tasks"].append({
+                            "Analyst": name, "Week": rec.get("Week", "") or "",
+                            "Task KPI": rec.get("Task KPI", "") or "", "Task": task,
+                            "Action": action, "Outcome": outcome, "Explanation": expl})
             except Exception:
                 pass
         return data
@@ -368,18 +388,34 @@ class SheetsStore:
             ws = self._get_or_create(ws_map, name)
             self._write(ws, header, ROW_BUILDERS[name](data))
 
-        # Per-analyst breakdown: write one worksheet per analyst
-        by_analyst = {}
+        # Per-analyst breakdown: rewrite each analyst's tab as the full pre-filled
+        # Week x Task KPI grid, merging in whatever entries exist for that analyst.
+        weeks = _tracking_weeks()
+        wset = set(weeks)
+        kpis = [t.get("Task", "") for t in data.get("tasks", []) if t.get("Task")]
+        by_key, extra = {}, {}
         for r in data.get("analyst_tasks", []):
-            by_analyst.setdefault((r.get("Analyst") or "").strip(), []).append(r)
+            an = (r.get("Analyst") or "").strip()
+            wk = r.get("Week", "") or ""
+            by_key[(an, wk, r.get("Task KPI", "") or "")] = r
+            has = (str(r.get("Task", "")).strip() or str(r.get("Action", "")).strip()
+                   or bool(r.get("Outcome")) or str(r.get("Explanation", "")).strip())
+            if wk and wk not in wset and has:  # keep entries for weeks outside the window
+                extra.setdefault(an, []).append(r)
         for a in data.get("analysts", []):
             name = (a.get("Analyst") or "").strip()
             if not name:
                 continue
             ws = self._get_or_create(ws_map, _safe_title(name))
-            rows = [[r.get("Week", ""), r.get("Task KPI", ""), r.get("Task", "") or "",
-                     r.get("Action", "") or "", bool(r.get("Outcome")), r.get("Explanation", "") or ""]
-                    for r in by_analyst.get(name, [])]
+            rows = []
+            for wk in weeks:
+                for kpi in kpis:
+                    r = by_key.get((name, wk, kpi), {})
+                    rows.append([wk, kpi, r.get("Task", "") or "", r.get("Action", "") or "",
+                                 bool(r.get("Outcome")), r.get("Explanation", "") or ""])
+            for r in extra.get(name, []):
+                rows.append([r.get("Week", ""), r.get("Task KPI", ""), r.get("Task", "") or "",
+                             r.get("Action", "") or "", bool(r.get("Outcome")), r.get("Explanation", "") or ""])
             self._write(ws, ANALYST_HEADER, rows)
 
     def _write(self, ws, headers, rows):

@@ -47,7 +47,7 @@ def week_options(existing_weeks):
     """Return (sorted week-start keys, current week key). Always includes the
     current week, a window around it, and any week that already has data."""
     cur_mon = date.today() - timedelta(days=date.today().weekday())
-    weeks = {(cur_mon + timedelta(weeks=i)).isoformat() for i in range(-16, 9)}
+    weeks = {(cur_mon + timedelta(weeks=i)).isoformat() for i in range(-2, 13)}
     weeks |= {w for w in existing_weeks if w}
     return sorted(weeks), cur_mon.isoformat()
 
