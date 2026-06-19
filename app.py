@@ -464,19 +464,24 @@ with tab_an:
     week_keys, cur_week = week_options(existing_weeks)
     wlabels = [week_label(w) for w in week_keys]
     default_idx = week_keys.index(cur_week) if cur_week in week_keys else len(week_keys) - 1
-    sel_wlabel = st.selectbox("Week", wlabels, index=default_idx, key="an_week")
+
+    pick = st.columns(2)
+    sel_wlabel = pick[0].selectbox("Week", wlabels, index=default_idx, key="an_week")
     sel_week = week_keys[wlabels.index(sel_wlabel)]
-    st.caption("Each KPI category has its own block. Fill in the Task (what you'll do), the Action / "
-               "what success looks like, tick Outcome when achieved, and add an Explanation. The text "
-               "boxes wrap and resize, so you always see the full entry. Opens on the current week.")
+    sel_analyst = (pick[1].selectbox("Analyst", analysts, index=0, key="an_person")
+                   if analysts else None)
+    st.caption("Pick a week and an analyst to see just that person's KPIs. Each KPI category has its "
+               "own block: fill in the Task (what you'll do), the Action / what success looks like, "
+               "tick Outcome when achieved, and add an Explanation. The text boxes wrap and resize, so "
+               "you always see the full entry. Opens on the current week.")
 
     by_wa = {}
     for r in data["analyst_tasks"]:
         by_wa.setdefault((r.get("Week"), r.get("Analyst")), {})[r.get("Task KPI")] = r
 
     new_entries = []
-    for an in analysts:
-        st.markdown(f"### {an}")
+    if sel_analyst:
+        an = sel_analyst
         saved = by_wa.get((sel_week, an), {})
         done = 0
         for kpi in kpis:
@@ -506,9 +511,9 @@ with tab_an:
         st.caption(f"Outcomes achieved this week: **{done}/{len(kpis)}**")
         st.divider()
 
-    # keep every other week/analyst as-is; replace just the selected week's rows
+    # keep every other week/analyst as-is; replace just the selected week + analyst's rows
     kept = [r for r in data["analyst_tasks"]
-            if not (r.get("Week") == sel_week and r.get("Analyst") in analysts)]
+            if not (r.get("Week") == sel_week and r.get("Analyst") == sel_analyst)]
     st.session_state.data["analyst_tasks"] = kept + new_entries
 
     with st.expander("\u2699\ufe0f Manage analysts"):
